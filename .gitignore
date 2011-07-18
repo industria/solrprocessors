@@ -1,0 +1,8 @@
+# emacs ignores for backup file and lock file
+*~
+*\#
+.\#*
+
+# Maven
+target/
+dist/
