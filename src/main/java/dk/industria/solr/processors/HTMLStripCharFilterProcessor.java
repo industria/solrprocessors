@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Collection;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,40 +117,47 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 
 
 	// For all fields configured
-	for(String field : this.fieldsToProcess) {
+	for(String fieldName : this.fieldsToProcess) {
 	    if(logger.isDebugEnabled()) {
-		logger.debug("Processing field: " + field);
+		logger.debug("Processing field: " + fieldName);
 	    }
 
+	    SolrInputDocument doc = cmd.getSolrInputDocument();
+	    SolrInputField field = doc.getField(fieldName);
+	    if(null == field) {
+		logger.debug("Field [" + fieldName + "] not in document.");
+		// proceed to next field
+		continue; 
+	    }
+	    // Field was in document so time to process the value
+	    logger.debug("Before update: " + field.toString());
 
+	    Collection<Object> values = field.getValues();
+	    if(null == values) {
+		logger.debug("Field [" + fieldName + "] returned null for values.");
+		// proceed to next field
+		continue;
+	    }
+	    // Process the field values
+	    Collection<Object> newValues = new ArrayList<Object>();
+	    for(Object value : values) {
+		logger.debug("Value: " + value.toString());
 
+		logger.debug(value.getClass().toString());
+		String strippedValue = htmlStripString((String)value);
+		
+
+		newValues.add(strippedValue);
+	    }
+    	    float boost = field.getBoost();
+	    field.setValue(newValues, boost);
+
+	    logger.debug("After update: " + field.toString());
 	}
 
 
 
-
-	SolrInputDocument doc = cmd.getSolrInputDocument();
-
-
-	SolrInputField field = doc.getField("underrubrik_text");
-	if (null != field) {
-
-	    // Right now we just assume string so we blindly cast it
-	    String fieldValue = (String)field.getValue();
-	    logger.error("Field value:" + fieldValue);
-
-	    String strippedFieldValue = htmlStripString(fieldValue);
-	    logger.error("Stripped field value:" + strippedFieldValue);
-
-
-	    // Update the field
-	    float boost = field.getBoost();
-	    field.setValue(strippedFieldValue, boost);
-
-
-
-	}
-
+	log.debug("Leaving processAdd");
 
 	// pass it up the chain
 	super.processAdd(cmd);
