@@ -5,7 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-
+import java.util.List;
 
 import org.apache.lucene.analysis.CharReader;
 import org.apache.lucene.analysis.CharStream;
@@ -26,10 +26,12 @@ import org.apache.solr.update.processor.UpdateRequestProcessor;
 
 
 public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
-
-
+    /**
+     * Size of the buffer used to read the input through the HTMLStripCharFilter.
+     */
     private static final int BUFFER_SIZE = 4096;
 
+    private List<String> fieldsToProcess;
 
     private String removeDuplicateSpaces(String text) {
 	if(null == text) return ""; 
@@ -77,9 +79,14 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 
 
 
-
-    public HTMLStripCharFilterProcessor(UpdateRequestProcessor next) {
-	super( next );
+    /**
+     * Construct a HTMLStripCharFilterProcessor.
+     * @param fields List of fields to process.
+     * @param next Next UpdateRequestProcessor in the processor chain.
+     */
+    public HTMLStripCharFilterProcessor(List<String> fields, UpdateRequestProcessor next) {
+	super(next);
+	this.fieldsToProcess = fields; 
     }
   
     public void processAdd(AddUpdateCommand cmd) throws IOException {

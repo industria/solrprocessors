@@ -18,22 +18,63 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 
 
 public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory {
+    /**
+     * Logger
+     */
     private static Logger log = LoggerFactory.getLogger(HTMLStripCharFilterProcessorFactory.class);
+    /**
+     * List of fields configured for HTML character stripping.
+     */
+    private List<String> fieldsToProcess;
 
-    private NamedList configArgs;
-    
 
+    /**
+     * Init called by SOLR processor chain
+     * The values configured for keys field is extracted to fieldsToProcess.
+     * @param args NamedList of parameters set in the processor definition (solrconfig.xml)
+     */
     public void init(NamedList args) {
-	configArgs = args;
-
-	List<String> fields = args.getAll("field");
-
-
+	this.fieldsToProcess = args.getAll("field");
+	if(this.fieldsToProcess.isEmpty()) {
+	    log.warn("No fields defined for HTMLStripCharFilterProcessor");
+	} else if(log.isDebugEnabled()) {
+	    String fls = configuredFieldsString(this.fieldsToProcess);
+	    log.debug("HTMLStripCharFilterProcessor fields:" + fls);
+	}
     }
 
 
+    /**
+     * Factory method for the HTMLStripCharFilterProcessor called by SOLR processor chain.
+     * @param req SolrQueryRequest
+     * @param rsp SolrQueryResponse
+     * @param next UpdateRequestProcessor
+     * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
+     */
     public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-	log.error("Factory created!!!!" + configArgs.toString());
-	return new HTMLStripCharFilterProcessor(next);
+	if(log.isDebugEnabled()) {
+	    String fls = configuredFieldsString(this.fieldsToProcess);
+	    log.debug("Create HTMLStripCharFilterProcessor with fields:" + fls);
+	}
+	return new HTMLStripCharFilterProcessor(this.fieldsToProcess, next);
     }
+
+
+
+    /**
+     * Generate a string containing the fields configured, the string is
+     * on the form {field1} {field2} ... {fieldn}
+     * @param fields The fields for the field string.
+     * @return String on the form {field1} {field2} ... {fieldn}
+     */
+    private static String configuredFieldsString(List<String> fields) {
+	StringBuilder sb = new StringBuilder();
+	for(String field : fields) {
+	    sb.append(" {");
+	    sb.append(field);
+	    sb.append("}");
+	}
+	return sb.toString();
+    }
+
 }
