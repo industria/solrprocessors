@@ -21,7 +21,7 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
     /**
      * Logger
      */
-    private static Logger log = LoggerFactory.getLogger(HTMLStripCharFilterProcessorFactory.class);
+    private static Logger logger = LoggerFactory.getLogger(HTMLStripCharFilterProcessorFactory.class);
     /**
      * List of fields configured for HTML character stripping.
      */
@@ -36,10 +36,10 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
     public void init(NamedList args) {
 	this.fieldsToProcess = args.getAll("field");
 	if(this.fieldsToProcess.isEmpty()) {
-	    log.warn("No fields defined for HTMLStripCharFilterProcessor");
-	} else if(log.isDebugEnabled()) {
+	    logger.warn("No fields defined for HTMLStripCharFilterProcessor");
+	} else if(logger.isDebugEnabled()) {
 	    String fls = configuredFieldsString(this.fieldsToProcess);
-	    log.debug("HTMLStripCharFilterProcessor fields:" + fls);
+	    logger.debug("HTMLStripCharFilterProcessor fields:" + fls);
 	}
     }
 
@@ -52,9 +52,9 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
      */
     public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-	if(log.isDebugEnabled()) {
+	if(logger.isDebugEnabled()) {
 	    String fls = configuredFieldsString(this.fieldsToProcess);
-	    log.debug("Create HTMLStripCharFilterProcessor with fields:" + fls);
+	    logger.debug("Create HTMLStripCharFilterProcessor with fields:" + fls);
 	}
 	return new HTMLStripCharFilterProcessor(this.fieldsToProcess, next);
     }

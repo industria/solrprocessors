@@ -7,6 +7,10 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import org.apache.lucene.analysis.CharReader;
 import org.apache.lucene.analysis.CharStream;
 
@@ -27,17 +31,32 @@ import org.apache.solr.update.processor.UpdateRequestProcessor;
 
 public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     /**
+     * Logger 
+     * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
+     * which makes controlling log output from this project difficult unless a different 
+     * logger is used as in this case.
+     */
+    private static Logger logger = LoggerFactory.getLogger(HTMLStripCharFilterProcessor.class);
+    /**
      * Size of the buffer used to read the input through the HTMLStripCharFilter.
      */
     private static final int BUFFER_SIZE = 4096;
 
+    /**
+     * List of fields to process with the HTMLStripCharFilter.
+     */
     private List<String> fieldsToProcess;
 
+    /**
+     * Removes duplicate spaces from a string.
+     */
     private String removeDuplicateSpaces(String text) {
 	if(null == text) return ""; 
 	String trimmed = text.trim();
 	return trimmed.replaceAll("\\p{Blank}{2,}", " ");
     }
+
+
 
     private String htmlStripString(String text) {
 
@@ -46,10 +65,10 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 	StringReader sr = new StringReader(text);
 	Reader r = null;
 	if(sr.markSupported()) {
-	    log.error("StringReader used directly");
+	    logger.error("StringReader used directly");
 	    r = sr;
 	} else {
-	    log.error("BufferedReader because mark support is not supported.");
+	    logger.error("BufferedReader because mark support is not supported.");
 	    r = new BufferedReader(sr);
 	}
 	CharStream cs = CharReader.get(r);
@@ -68,15 +87,13 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 	    }
 	    filter.close();
 	} catch(IOException ioe) {
-	    log.error("IOException thrown in HTML Stripper: " + ioe.toString());
+	    logger.error("IOException thrown in HTML Stripper: " + ioe.toString());
 	}
 	
 	// The HTML strip filter replaces tags with spaces. Therefore the string
 	// should be processed to remove duplicate spaces in the string.
 	return removeDuplicateSpaces(stripped.toString());
     }
-
-
 
 
     /**
@@ -88,8 +105,28 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 	super(next);
 	this.fieldsToProcess = fields; 
     }
-  
+
+    /**
+     * Called by the processor chain on document add/update opeations.
+     * This is where we process the fields configured before they are indexed.
+     * @param cmd AddUpdateCommand
+     */
     public void processAdd(AddUpdateCommand cmd) throws IOException {
+
+
+	// For all fields configured
+	for(String field : this.fieldsToProcess) {
+	    if(logger.isDebugEnabled()) {
+		logger.debug("Processing field: " + field);
+	    }
+
+
+
+	}
+
+
+
+
 	SolrInputDocument doc = cmd.getSolrInputDocument();
 
 
@@ -98,10 +135,10 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 
 	    // Right now we just assume string so we blindly cast it
 	    String fieldValue = (String)field.getValue();
-	    log.error("Field value:" + fieldValue);
+	    logger.error("Field value:" + fieldValue);
 
 	    String strippedFieldValue = htmlStripString(fieldValue);
-	    log.error("Stripped field value:" + strippedFieldValue);
+	    logger.error("Stripped field value:" + strippedFieldValue);
 
 
 	    // Update the field
