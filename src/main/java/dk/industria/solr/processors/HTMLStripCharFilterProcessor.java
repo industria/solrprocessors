@@ -55,7 +55,9 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     private String removeDuplicateSpaces(String text) {
 	if(null == text) return ""; 
 	String trimmed = text.trim();
-	return trimmed.replaceAll("\\p{Blank}{2,}", " ");
+	// Strip out No-break space 
+	String charStripped = trimmed.replaceAll("\u00A0", " ");
+	return charStripped.replaceAll("\\p{Space}{2,}", " ");
     }
 
 
