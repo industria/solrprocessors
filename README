@@ -4,7 +4,38 @@ Implements processors for use in the Solr update request processor chain.
 
 The project contains the following processors:
 
+- AllowDisallowIndexingProcessor
 - HTMLStripCharFilterProcessor
+
+
+==============================
+AllowDisallowIndexingProcessor
+==============================
+
+The AllowDisallowIndexingProcessor makes it possible to configure rules based on field content for deciding whether or not a given document should be indexed or not.
+
+The use case for processor:
+A system not under your control pushes documents to be indexed and you don't want all the document types in the index. 
+
+An example of this use case is Escenics indexer-webapp.
+
+
+The processor is configured by supplying the lst element with a name indicating the semantics of the processor, which can be either allow or disallow. The semantics work as follows:
+
+allow : Indexes documents matching at least one rule in the list, dropping everything else.
+
+disallow : Indexes documents that doesn't match any rules in the list.
+
+Rules are defined by using the str element giving the field to check in the name attribute and the match rule as the value of the element.
+
+Example allow rule only indexing documents with a field contenttype set to article
+
+<lst name="allow">
+  <str name="contenttype">article</str>
+</lst>
+ 
+If more than one rule is supplied they are checked untill one of them matches or none of them matched.
+
 
 
 ============================
