@@ -2,8 +2,12 @@ package dk.industria.solr.processors;
 
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
-
+ 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +43,44 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
 	return null;
     }
 
+
+    /**
+     * Converts the raw NamedList field match configuration to a list of FieldMatchRule.
+     * @param configuration The NamedList of allow/disallow lst element (solrconfig.xml).
+     * @return List of FieldMatchRule items.
+     */
+    private List<FieldMatchRule> getFieldMatchRules(NamedList configuration) {
+	List<FieldMatchRule> rules = new ArrayList<FieldMatchRule>();
+
+	Iterator<Map.Entry<String, ?>> itr = configuration.iterator();
+	while(itr.hasNext()) {
+	    Map.Entry<String, ?> kv = (Map.Entry<String, ?>)itr.next();
+	    String key = kv.getKey();
+	    if(null == key) {
+		logger.warn("Item missing name attribute: " + kv.toString());
+		continue;
+	    }
+	    Object ovalue = kv.getValue();
+	    if(!(ovalue instanceof String)) {
+		logger.warn("Item not a str element: " + kv.toString());
+		continue;
+	    }
+	    String value = ((String)ovalue).trim();
+	    if(0 == value.length()) {
+		logger.warn("Item value trimmed is an empty pattern: " + kv.toString());
+		continue;
+	    }
+	    logger.debug("Creating FieldMatchRule with: [" + key + "] [" + value + "]");
+	    FieldMatchRule rule = new FieldMatchRule(key, value);
+	    rules.add(rule);
+	}
+	if(logger.isDebugEnabled()) {
+	    logger.debug(rules.toString());
+	}
+	return rules;
+    }
+
+
     /**
      * Init called by Solr processor chain
      * 
@@ -53,12 +95,14 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
 	NamedList allow = getConfiguredList(args, "allow");
 	if(null != allow) {
 	    logger.debug("Running with allow semantics: " + allow.toString());
+	    List<FieldMatchRule> allowRules = getFieldMatchRules(allow);
 	    return;
 	}
 
 	NamedList disallow = getConfiguredList(args, "disallow");
 	if(null != disallow) {
 	    logger.debug("Running with disallow semantics: " + disallow.toString());
+	    List<FieldMatchRule> disallowRules = getFieldMatchRules(disallow);
 	    return;
 	}
 
