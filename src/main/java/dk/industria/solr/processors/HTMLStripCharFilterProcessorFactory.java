@@ -35,6 +35,7 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      */
     public void init(NamedList args) {
 	this.fieldsToProcess = args.getAll("field");
+
 	if(this.fieldsToProcess.isEmpty()) {
 	    logger.warn("No fields defined for HTMLStripCharFilterProcessor");
 	} else if(logger.isDebugEnabled()) {
