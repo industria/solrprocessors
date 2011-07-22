@@ -17,7 +17,6 @@ import org.apache.lucene.analysis.CharReader;
 import org.apache.lucene.analysis.CharStream;
 
 import org.apache.solr.analysis.HTMLStripCharFilter;
-import org.apache.solr.analysis.HTMLStripCharFilterFactory;
 
 
 import org.apache.solr.common.SolrInputDocument;
@@ -51,6 +50,9 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 
     /**
      * Removes duplicate spaces from a string.
+     * TODO: Also removes no break space which should be moved out
+     * @param text String possibly containing duplicate spaces.
+     * @return String with duplicate spaces removed.
      */
     private String removeDuplicateSpaces(String text) {
 	if(null == text) return ""; 
@@ -61,13 +63,19 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     }
 
 
-
+    /**
+        * Strip HTML/XML from string by reading it through the
+        * the Solr HTMLStripCharFilter.The string is also normalized
+        * with regards to spacing.
+       * @param text String containing HTML/XML to be stripped.
+       * @return  String with HTML/XML removed.
+       */
     private String htmlStripString(String text) {
 
 	StringBuilder stripped = new StringBuilder();
 
 	StringReader sr = new StringReader(text);
-	Reader r = null;
+	Reader r;
 	if(sr.markSupported()) {
 	    logger.error("StringReader used directly");
 	    r = sr;
