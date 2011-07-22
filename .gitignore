@@ -6,3 +6,8 @@
 # Maven
 target/
 dist/
+
+#IDEA
+*.iml
+*.ipr
+*.iws
