@@ -25,7 +25,7 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
     /**
      * Logger
      */
-    private static Logger logger = LoggerFactory.getLogger(AllowDisallowIndexingProcessorFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(AllowDisallowIndexingProcessorFactory.class);
 
 
     /**
@@ -87,7 +87,7 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * 
      * @param args NamedList of parameters set in the processor definition (solrconfig.xml)
      */
-    public void init(NamedList args) {
+    public void init(final NamedList args) {
 	if(logger.isDebugEnabled()) {
 	    logger.debug("ARGS: " + args.toString());
 	}

@@ -37,7 +37,7 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * which makes controlling log output from this project difficult unless a different 
      * logger is used as in this case.
      */
-    private static Logger logger = LoggerFactory.getLogger(HTMLStripCharFilterProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(HTMLStripCharFilterProcessor.class);
     /**
      * Size of the buffer used to read the input through the HTMLStripCharFilter.
      */

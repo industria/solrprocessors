@@ -21,7 +21,7 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
     /**
      * Logger
      */
-    private static Logger logger = LoggerFactory.getLogger(HTMLStripCharFilterProcessorFactory.class);
+    private final static Logger logger = LoggerFactory.getLogger(HTMLStripCharFilterProcessorFactory.class);
     /**
      * List of fields configured for HTML character stripping.
      */
@@ -33,7 +33,7 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      * The values configured for keys field is extracted to fieldsToProcess.
      * @param args NamedList of parameters set in the processor definition (solrconfig.xml)
      */
-    public void init(NamedList args) {
+    public void init(final NamedList args) {
         // TODO: Really can do that unless solrconfig is always str elements otherwise types break
 	this.fieldsToProcess = args.getAll("field");
 

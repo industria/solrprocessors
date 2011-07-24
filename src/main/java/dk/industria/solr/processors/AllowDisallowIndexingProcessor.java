@@ -22,7 +22,7 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
      * which makes controlling log output from this project difficult unless a different 
      * logger is used as in this case.
      */
-    private static Logger logger = LoggerFactory.getLogger(AllowDisallowIndexingProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(AllowDisallowIndexingProcessor.class);
 
 
     /**

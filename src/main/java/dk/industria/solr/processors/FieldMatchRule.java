@@ -13,7 +13,7 @@ public class FieldMatchRule {
     /**
      * Logger 
      */
-    private static Logger logger = LoggerFactory.getLogger(FieldMatchRule.class);
+    private static final Logger logger = LoggerFactory.getLogger(FieldMatchRule.class);
 
 
     private String field;
