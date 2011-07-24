@@ -34,6 +34,7 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      * @param args NamedList of parameters set in the processor definition (solrconfig.xml)
      */
     public void init(NamedList args) {
+        // TODO: Really can do that unless solrconfig is always str elements otherwise types break
 	this.fieldsToProcess = args.getAll("field");
 
 	if(this.fieldsToProcess.isEmpty()) {
