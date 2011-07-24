@@ -61,12 +61,12 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
 		logger.warn("Item missing name attribute: " + kv.toString());
 		continue;
 	    }
-	    Object ovalue = kv.getValue();
-	    if(!(ovalue instanceof String)) {
+	    Object oValue = kv.getValue();
+	    if(!(oValue instanceof String)) {
 		logger.warn("Item not a str element: " + kv.toString());
 		continue;
 	    }
-	    String value = ((String)ovalue).trim();
+	    String value = ((String)oValue).trim();
 	    if(0 == value.length()) {
 		logger.warn("Item value trimmed is an empty pattern: " + kv.toString());
 		continue;
