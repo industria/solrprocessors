@@ -52,9 +52,10 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
     private List<FieldMatchRule> getFieldMatchRules(NamedList configuration) {
 	List<FieldMatchRule> rules = new ArrayList<FieldMatchRule>();
 
-	Iterator<Map.Entry<String, ?>> itr = configuration.iterator();
+    @SuppressWarnings("unchecked")
+	Iterator<Map.Entry<String, ?>> itr = (Iterator<Map.Entry<String, ?>>)configuration.iterator();
 	while(itr.hasNext()) {
-	    Map.Entry<String, ?> kv = (Map.Entry<String, ?>)itr.next();
+	    Map.Entry<String, ?> kv = itr.next();
 	    String key = kv.getKey();
 	    if(null == key) {
 		logger.warn("Item missing name attribute: " + kv.toString());
