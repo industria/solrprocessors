@@ -27,26 +27,26 @@ public class FieldMatchRule {
      * @param pattern Pattern to match on the field.
      */
     public FieldMatchRule(String field, String pattern) {
-    this.field = field;
-    this.pattern = pattern;
+        this.field = field;
+        this.pattern = pattern;
     }
 
 
     public String toString() {
-    StringBuilder s = new StringBuilder();
-    s.append("Field: ");
-    if(null != this.field) {
-        s.append(this.field);
-    } else {
-        s.append("null");
-    }
-    s.append(" Pattern: ");
-    if(null != this.pattern) {
-        s.append(this.pattern);
-    } else {
-        s.append("null");
-    }
-    return s.toString();
+        StringBuilder s = new StringBuilder();
+        s.append("Field: ");
+        if(null != this.field) {
+            s.append(this.field);
+        } else {
+            s.append("null");
+        }
+        s.append(" Pattern: ");
+        if(null != this.pattern) {
+            s.append(this.pattern);
+        } else {
+            s.append("null");
+        }
+        return s.toString();
     }
 
 
