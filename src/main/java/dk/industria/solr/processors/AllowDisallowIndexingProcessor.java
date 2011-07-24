@@ -30,7 +30,7 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
      * @param next Next UpdateRequestProcessor in the processor chain.
      */
     public AllowDisallowIndexingProcessor(UpdateRequestProcessor next) {
-	super(next);
+    super(next);
     }
 
     /**
@@ -40,16 +40,16 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
      */
     public void processAdd(AddUpdateCommand cmd) throws IOException {
 
-	//SolrInputDocument doc = cmd.getSolrInputDocument();
-	//SolrInputField field = doc.getField(fieldName);
+    //SolrInputDocument doc = cmd.getSolrInputDocument();
+    //SolrInputField field = doc.getField(fieldName);
 
-	logger.debug("processAdd");
+    logger.debug("processAdd");
 
 
-	// We should choose whether to pass the document up the chain or just stop here
+    // We should choose whether to pass the document up the chain or just stop here
 
-	// pass it up the chain
-	super.processAdd(cmd);
+    // pass it up the chain
+    super.processAdd(cmd);
     }
 
 

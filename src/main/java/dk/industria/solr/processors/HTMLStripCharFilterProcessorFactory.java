@@ -35,14 +35,14 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      */
     public void init(final NamedList args) {
         // TODO: Really can do that unless solrconfig is always str elements otherwise types break
-	this.fieldsToProcess = args.getAll("field");
+    this.fieldsToProcess = args.getAll("field");
 
-	if(this.fieldsToProcess.isEmpty()) {
-	    logger.warn("No fields defined for HTMLStripCharFilterProcessor");
-	} else if(logger.isDebugEnabled()) {
-	    String fls = configuredFieldsString(this.fieldsToProcess);
-	    logger.debug("HTMLStripCharFilterProcessor fields:" + fls);
-	}
+    if(this.fieldsToProcess.isEmpty()) {
+        logger.warn("No fields defined for HTMLStripCharFilterProcessor");
+    } else if(logger.isDebugEnabled()) {
+        String fls = configuredFieldsString(this.fieldsToProcess);
+        logger.debug("HTMLStripCharFilterProcessor fields:" + fls);
+    }
     }
 
 
@@ -54,11 +54,11 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
      */
     public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-	if(logger.isDebugEnabled()) {
-	    String fls = configuredFieldsString(this.fieldsToProcess);
-	    logger.debug("Create HTMLStripCharFilterProcessor with fields:" + fls);
-	}
-	return new HTMLStripCharFilterProcessor(this.fieldsToProcess, next);
+    if(logger.isDebugEnabled()) {
+        String fls = configuredFieldsString(this.fieldsToProcess);
+        logger.debug("Create HTMLStripCharFilterProcessor with fields:" + fls);
+    }
+    return new HTMLStripCharFilterProcessor(this.fieldsToProcess, next);
     }
 
 
@@ -70,13 +70,13 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      * @return String on the form {field1} {field2} ... {fieldn}
      */
     private static String configuredFieldsString(List<String> fields) {
-	StringBuilder sb = new StringBuilder();
-	for(String field : fields) {
-	    sb.append(" {");
-	    sb.append(field);
-	    sb.append("}");
-	}
-	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        for(String field : fields) {
+            sb.append(" {");
+            sb.append(field);
+            sb.append("}");
+        }
+        return sb.toString();
     }
 
 }

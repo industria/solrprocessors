@@ -55,11 +55,11 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * @return String with duplicate spaces removed.
      */
     private String removeDuplicateSpaces(String text) {
-	if(null == text) return ""; 
-	String trimmed = text.trim();
-	// Strip out No-break space 
-	String charStripped = trimmed.replaceAll("\u00A0", " ");
-	return charStripped.replaceAll("\\p{Space}{2,}", " ");
+    if(null == text) return "";
+    String trimmed = text.trim();
+    // Strip out No-break space
+    String charStripped = trimmed.replaceAll("\u00A0", " ");
+    return charStripped.replaceAll("\\p{Space}{2,}", " ");
     }
 
 
@@ -72,39 +72,39 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
        */
     private String htmlStripString(String text) {
 
-	StringBuilder stripped = new StringBuilder();
+    StringBuilder stripped = new StringBuilder();
 
-	StringReader sr = new StringReader(text);
-	Reader r;
-	if(sr.markSupported()) {
-	    logger.error("StringReader used directly");
-	    r = sr;
-	} else {
-	    logger.error("BufferedReader because mark support is not supported.");
-	    r = new BufferedReader(sr);
-	}
-	CharStream cs = CharReader.get(r);
+    StringReader sr = new StringReader(text);
+    Reader r;
+    if(sr.markSupported()) {
+        logger.error("StringReader used directly");
+        r = sr;
+    } else {
+        logger.error("BufferedReader because mark support is not supported.");
+        r = new BufferedReader(sr);
+    }
+    CharStream cs = CharReader.get(r);
 
-	try {
-	    char[] buffer = new char[BUFFER_SIZE];
-	    HTMLStripCharFilter filter = new HTMLStripCharFilter(cs);
-	    while(true) {
-		int nCharsRead = filter.read(buffer);
-		if(-1 == nCharsRead) {
-		    break;
-		}
-		if(0 < nCharsRead) {
-		    stripped.append(buffer, 0, nCharsRead);
-		}
-	    }
-	    filter.close();
-	} catch(IOException ioe) {
-	    logger.error("IOException thrown in HTML Stripper: " + ioe.toString());
-	}
-	
-	// The HTML strip filter replaces tags with spaces. Therefore the string
-	// should be processed to remove duplicate spaces in the string.
-	return removeDuplicateSpaces(stripped.toString());
+    try {
+        char[] buffer = new char[BUFFER_SIZE];
+        HTMLStripCharFilter filter = new HTMLStripCharFilter(cs);
+        while(true) {
+        int nCharsRead = filter.read(buffer);
+        if(-1 == nCharsRead) {
+            break;
+        }
+        if(0 < nCharsRead) {
+            stripped.append(buffer, 0, nCharsRead);
+        }
+        }
+        filter.close();
+    } catch(IOException ioe) {
+        logger.error("IOException thrown in HTML Stripper: " + ioe.toString());
+    }
+
+    // The HTML strip filter replaces tags with spaces. Therefore the string
+    // should be processed to remove duplicate spaces in the string.
+    return removeDuplicateSpaces(stripped.toString());
     }
 
 
@@ -114,8 +114,8 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * @param next Next UpdateRequestProcessor in the processor chain.
      */
     public HTMLStripCharFilterProcessor(List<String> fields, UpdateRequestProcessor next) {
-	super(next);
-	this.fieldsToProcess = fields; 
+    super(next);
+    this.fieldsToProcess = fields;
     }
 
     /**
@@ -126,51 +126,51 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     public void processAdd(AddUpdateCommand cmd) throws IOException {
 
 
-	// For all fields configured
-	for(String fieldName : this.fieldsToProcess) {
-	    if(logger.isDebugEnabled()) {
-		logger.debug("Processing field: " + fieldName);
-	    }
+    // For all fields configured
+    for(String fieldName : this.fieldsToProcess) {
+        if(logger.isDebugEnabled()) {
+        logger.debug("Processing field: " + fieldName);
+        }
 
-	    SolrInputDocument doc = cmd.getSolrInputDocument();
-	    SolrInputField field = doc.getField(fieldName);
-	    if(null == field) {
-		logger.debug("Field [" + fieldName + "] not in document.");
-		// proceed to next field
-		continue; 
-	    }
-	    // Field was in document so time to process the value
-	    logger.debug("Before update: " + field.toString());
+        SolrInputDocument doc = cmd.getSolrInputDocument();
+        SolrInputField field = doc.getField(fieldName);
+        if(null == field) {
+        logger.debug("Field [" + fieldName + "] not in document.");
+        // proceed to next field
+        continue;
+        }
+        // Field was in document so time to process the value
+        logger.debug("Before update: " + field.toString());
 
-	    Collection<Object> values = field.getValues();
-	    if(null == values) {
-		logger.debug("Field [" + fieldName + "] returned null for values.");
-		// proceed to next field
-		continue;
-	    }
-	    // Process the field values
-	    Collection<Object> newValues = new ArrayList<Object>();
-	    for(Object value : values) {
-		logger.debug("Value: " + value.toString());
+        Collection<Object> values = field.getValues();
+        if(null == values) {
+        logger.debug("Field [" + fieldName + "] returned null for values.");
+        // proceed to next field
+        continue;
+        }
+        // Process the field values
+        Collection<Object> newValues = new ArrayList<Object>();
+        for(Object value : values) {
+        logger.debug("Value: " + value.toString());
 
-		logger.debug(value.getClass().toString());
-		String strippedValue = htmlStripString((String)value);
-		
-
-		newValues.add(strippedValue);
-	    }
-    	    float boost = field.getBoost();
-	    field.setValue(newValues, boost);
-
-	    logger.debug("After update: " + field.toString());
-	}
+        logger.debug(value.getClass().toString());
+        String strippedValue = htmlStripString((String)value);
 
 
+        newValues.add(strippedValue);
+        }
+            float boost = field.getBoost();
+        field.setValue(newValues, boost);
 
-	log.debug("Leaving processAdd");
+        logger.debug("After update: " + field.toString());
+    }
 
-	// pass it up the chain
-	super.processAdd(cmd);
+
+
+    log.debug("Leaving processAdd");
+
+    // pass it up the chain
+    super.processAdd(cmd);
     }
 
 
