@@ -17,7 +17,25 @@ import org.apache.solr.request.SolrQueryResponse;
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 
-
+/**
+ * Implements a factory for the HTMLStripCharFilterProcessor
+ *
+ * The main purpose of this is to process the init arguments into a list
+ * of fields that should be processed with the HTMLStripCharFilterProcessor.
+ *
+ * Configuration is done by placing str elements with a name attribute set to field
+ * and a element value set to the field that should be processed.
+ *
+ * Example processor configuration for processing fields header and content:
+ *
+ * {@code
+ * <processor class="dk.industria.solr.processors.HTMLStripCharFilterProcessorFactory">
+ *   <str name="field">header</str>
+ *   <str name="field">content</str>
+ * </processor>
+ * }
+ *
+ */
 public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory {
     /**
      * Logger
@@ -96,7 +114,7 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      * The values configured for keys field is extracted to fieldsToProcess.
      * @param args NamedList of parameters set in the processor definition (solrconfig.xml)
      */
-    public void init(final NamedList args) {
+    @Override public void init(final NamedList args) {
         this.fieldsToProcess = extractFields(args);
 
 	if(logger.isDebugEnabled()) {
@@ -117,7 +135,7 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      * @param next UpdateRequestProcessor
      * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
      */
-    public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
+    @Override public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
         if(logger.isDebugEnabled()) {
             String fls = configuredFieldsString(this.fieldsToProcess);
             logger.debug("Create HTMLStripCharFilterProcessor with fields:" + fls);
