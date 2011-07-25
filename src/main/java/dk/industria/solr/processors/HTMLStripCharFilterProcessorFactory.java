@@ -102,7 +102,7 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      */
     public List<String> getFields() {
 	if (null == fieldsToProcess) {
-	    return Collections.EMPTY_LIST;
+        return Collections.unmodifiableList(new ArrayList<String>());
 	}
 	return Collections.unmodifiableList(fieldsToProcess);
     }

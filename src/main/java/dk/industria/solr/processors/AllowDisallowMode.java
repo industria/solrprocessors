@@ -6,6 +6,6 @@ package dk.industria.solr.processors;
 public enum AllowDisallowMode {
     UNKNOWN,
     ALLOW,
-    DISALLOW;
+    DISALLOW
 }
 

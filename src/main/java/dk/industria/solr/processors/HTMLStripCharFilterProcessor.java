@@ -49,7 +49,7 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     /**
      * List of fields to process with the HTMLStripCharFilter.
      */
-    private List<String> fieldsToProcess;
+    private final List<String> fieldsToProcess;
 
     /**
      * Removes duplicate spaces from a string.
@@ -98,10 +98,9 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
         } catch(IOException ioe) {
             logger.error("IOException thrown in HTML Stripper: " + ioe.toString());
         }
-
-	// The HTML strip filter replaces tags with spaces. Therefore the string
-	// should be processed to remove duplicate spaces in the string.
-	return removeDuplicateSpaces(stripped.toString());
+        // The HTML strip filter replaces tags with spaces. Therefore the string
+        // should be processed to remove duplicate spaces in the string.
+        return removeDuplicateSpaces(stripped.toString());
     }
 
 
@@ -122,44 +121,44 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * @throws IOException
      */
     @Override public void processAdd(AddUpdateCommand cmd) throws IOException {
-	SolrInputDocument doc = cmd.getSolrInputDocument();
-	// For all configured fields
-	for(String fieldName : this.fieldsToProcess) {
-	    if(logger.isDebugEnabled()) {
-		logger.debug("Processing field: " + fieldName);
-	    }
+    SolrInputDocument doc = cmd.getSolrInputDocument();
+    // For all configured fields
+    for(String fieldName : this.fieldsToProcess) {
+        if(logger.isDebugEnabled()) {
+        logger.debug("Processing field: " + fieldName);
+        }
 
-	    SolrInputField field = doc.getField(fieldName);
-	    if(null == field) {
-		logger.debug("Field [" + fieldName + "] not in document.");
-		continue;
-	    }
+        SolrInputField field = doc.getField(fieldName);
+        if(null == field) {
+        logger.debug("Field [" + fieldName + "] not in document.");
+        continue;
+        }
 
-	    logger.debug("Before update: " + field.toString());
-	    
-	    Collection<Object> values = field.getValues();
-	    if(null == values) {
-		logger.debug("Field [" + fieldName + "] returned null for values.");
-		continue;
-	    }
+        logger.debug("Before update: " + field.toString());
 
-	    Collection<Object> newValues = new ArrayList<Object>();
-	    for(Object value : values) {
-		if(value instanceof String) {
-		    String strippedValue = htmlStripString((String)value);
-		    newValues.add(strippedValue);
-		} else {
-		    logger.info("Field value not processed: [" + fieldName + "] value [" + value + "] is not a String");
-		    newValues.add(value);
-		}
-	    }
-	    float boost = field.getBoost();
-	    field.setValue(newValues, boost);
-	    
-	    logger.debug("After update: " + field.toString());
-	}
-	// pass it up the chain
-	super.processAdd(cmd);
+        Collection<Object> values = field.getValues();
+        if(null == values) {
+        logger.debug("Field [" + fieldName + "] returned null for values.");
+        continue;
+        }
+
+        Collection<Object> newValues = new ArrayList<Object>();
+        for(Object value : values) {
+        if(value instanceof String) {
+            String strippedValue = htmlStripString((String)value);
+            newValues.add(strippedValue);
+        } else {
+            logger.info("Field value not processed: [" + fieldName + "] value [" + value + "] is not a String");
+            newValues.add(value);
+        }
+        }
+        float boost = field.getBoost();
+        field.setValue(newValues, boost);
+
+        logger.debug("After update: " + field.toString());
+    }
+    // pass it up the chain
+    super.processAdd(cmd);
     }
 
 

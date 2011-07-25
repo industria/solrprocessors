@@ -133,7 +133,7 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      */
     public List<FieldMatchRule> getRules() {
         if(null == rules) {
-            return Collections.EMPTY_LIST;
+            return Collections.unmodifiableList(new ArrayList<FieldMatchRule>());
         }
         return Collections.unmodifiableList(rules);
     }
