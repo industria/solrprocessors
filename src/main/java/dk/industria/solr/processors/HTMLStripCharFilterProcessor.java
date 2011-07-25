@@ -27,7 +27,12 @@ import org.apache.solr.update.AddUpdateCommand;
 
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 
-
+/**
+ * Implements an UpdateRequestProcessor for running Solr HTMLStripCharFilter on
+ * select document fields before they are stored. 
+ *
+ * For more information @see HTMLStripCharFilterProcessorFactory
+ */  
 public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     /**
      * Logger 
