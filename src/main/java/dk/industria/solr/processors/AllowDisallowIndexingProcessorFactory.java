@@ -178,6 +178,15 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * @return Instance of AllowDisallowIndexingProcessor initialized with the fields to process.
      */
     @Override public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
+        if(logger.isDebugEnabled()) {
+            StringBuilder dbg = new StringBuilder();
+            dbg.append("Create AllowDisallowIndexingProcessor with mode [");
+            dbg.append(this.mode.toString());
+            dbg.append("] rules [");
+            dbg.append(this.rules.toString());
+            dbg.append("]");
+            logger.debug(dbg.toString());
+        }
         return new AllowDisallowIndexingProcessor(this.mode, this.rules, next);
     }
 
