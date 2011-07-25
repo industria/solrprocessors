@@ -21,6 +21,30 @@ import org.apache.solr.update.processor.UpdateRequestProcessor;
 import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 
 
+/**
+ * Implements a factory for the AllowDisallowIndexingProcessor
+ *
+ * The main purpose of this is to process the init arguments into a list
+ * of field match rules and a mode of operation.
+ *
+ * Configuration is done by placing a lst element with in the processor element
+ * with a name attribute set to either allow or disallow which indicates the mode
+ * of operation. Within that lst element str elements with the name attribute set
+ * to the field to match and the value to the matching rule.
+ *
+ * Example processor configuration with mode of operation set to allow and matching
+ * field rules contenttype = default and contenttype = news, which would index
+ * all document with the field contenttype set to either default or news: 
+ *
+ * {@code
+ * <processor class="dk.industria.solr.processors.AllowDisallowIndexingProcessorFactory">
+ *   <lst name="allow">
+ *     <str name="contenttype">default</str>
+ *     <str name="contenttype">news</str>
+ *     </lst>
+ * </processor>
+ * }
+ */
 public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactory {
     /**
      * Logger
