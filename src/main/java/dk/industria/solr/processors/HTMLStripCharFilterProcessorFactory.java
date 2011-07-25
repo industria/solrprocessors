@@ -60,17 +60,17 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
 		String valueToAdd = ((String)value).trim();
 		if(0 < valueToAdd.length()) {
 		    if(logger.isDebugEnabled()) {
-			logger.debug("Adding field: [" + valueToAdd + "]");
+			logger.debug("Adding field, with value [" + valueToAdd + "]");
 		    }
 		    fieldNames.add(valueToAdd);
 		} else {
-		    logger.warn("Field of length 0 not added value was [" + value.toString() +"]");
+		    logger.warn("Misconfigured field, trim length 0 with value [" + value.toString() +"]");
 		}
 	    } else {
 		if(null == value) {
-		    logger.warn("Misconfigured field, value was [null]");
+		    logger.warn("Misconfigured field, with value [null]");
 		} else {
-		    logger.warn("Misconfigured field of type [" + value.getClass().getName() + "] with value [" + value.toString() +"]");
+		    logger.warn("Misconfigured field, type [" + value.getClass().getName() + "] with value [" + value.toString() +"]");
 		}
 	    }
 	}
