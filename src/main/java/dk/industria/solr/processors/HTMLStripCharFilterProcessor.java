@@ -69,20 +69,14 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * @return  String with HTML/XML removed.
      */
     private String htmlStripString(String text) {
-
-        StringBuilder stripped = new StringBuilder();
-
-        StringReader sr = new StringReader(text);
-        Reader r;
-        if(sr.markSupported()) {
-            logger.error("StringReader used directly");
-            r = sr;
-        } else {
-            logger.error("BufferedReader because mark support is not supported.");
-            r = new BufferedReader(sr);
+        Reader r = new StringReader(text);
+        if(!r.markSupported()) {
+            logger.debug("Reader returned false for mark support, wrapped in BufferedReader.");
+            r = new BufferedReader(r);
         }
         CharStream cs = CharReader.get(r);
 
+        StringBuilder stripped = new StringBuilder();
         try {
             char[] buffer = new char[BUFFER_SIZE];
             HTMLStripCharFilter filter = new HTMLStripCharFilter(cs);
@@ -108,10 +102,10 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 
     /**
      * Construct a HTMLStripCharFilterProcessor.
-     * @param fields List of fields to process.
+     * @param fields List of field names to process.
      * @param next Next UpdateRequestProcessor in the processor chain.
      */
-    public HTMLStripCharFilterProcessor(List<String> fields, UpdateRequestProcessor next) {
+    public HTMLStripCharFilterProcessor(final List<String> fields, final UpdateRequestProcessor next) {
         super(next);
         this.fieldsToProcess = fields;
     }
@@ -120,53 +114,45 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * Called by the processor chain on document add/update opeations.
      * This is where we process the fields configured before they are indexed.
      * @param cmd AddUpdateCommand
+     * @throws IOException
      */
-    public void processAdd(AddUpdateCommand cmd) throws IOException {
-
-
-	// For all fields configured
+    @Override public void processAdd(AddUpdateCommand cmd) throws IOException {
+	SolrInputDocument doc = cmd.getSolrInputDocument();
+	// For all configured fields
 	for(String fieldName : this.fieldsToProcess) {
 	    if(logger.isDebugEnabled()) {
 		logger.debug("Processing field: " + fieldName);
 	    }
 
-	    SolrInputDocument doc = cmd.getSolrInputDocument();
 	    SolrInputField field = doc.getField(fieldName);
 	    if(null == field) {
 		logger.debug("Field [" + fieldName + "] not in document.");
-		// proceed to next field
 		continue;
 	    }
-	    // Field was in document so time to process the value
+
 	    logger.debug("Before update: " + field.toString());
 	    
 	    Collection<Object> values = field.getValues();
 	    if(null == values) {
-            logger.debug("Field [" + fieldName + "] returned null for values.");
-            // proceed to next field
-            continue;
+		logger.debug("Field [" + fieldName + "] returned null for values.");
+		continue;
 	    }
-	    // Process the field values
+
 	    Collection<Object> newValues = new ArrayList<Object>();
 	    for(Object value : values) {
-		logger.debug("Value: " + value.toString());
-		
-		logger.debug(value.getClass().toString());
-		String strippedValue = htmlStripString((String)value);
-		
-		
-		newValues.add(strippedValue);
+		if(value instanceof String) {
+		    String strippedValue = htmlStripString((String)value);
+		    newValues.add(strippedValue);
+		} else {
+		    logger.info("Field value not processed: [" + fieldName + "] value [" + value + "] is not a String");
+		    newValues.add(value);
+		}
 	    }
 	    float boost = field.getBoost();
 	    field.setValue(newValues, boost);
 	    
 	    logger.debug("After update: " + field.toString());
 	}
-
-	
-	
-	log.debug("Leaving processAdd");
-	
 	// pass it up the chain
 	super.processAdd(cmd);
     }
