@@ -178,9 +178,7 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * @return Instance of AllowDisallowIndexingProcessor initialized with the fields to process.
      */
     @Override public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-        // TODO: Pass in allow mode, this.mode 
-        // TODO: Pass in rules, this.rules
-        return new AllowDisallowIndexingProcessor(next);
+        return new AllowDisallowIndexingProcessor(this.mode, this.rules, next);
     }
 
 

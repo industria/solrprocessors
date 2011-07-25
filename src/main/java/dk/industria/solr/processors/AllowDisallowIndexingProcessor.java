@@ -1,6 +1,7 @@
 package dk.industria.solr.processors;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +24,26 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
      * logger is used as in this case.
      */
     private static final Logger logger = LoggerFactory.getLogger(AllowDisallowIndexingProcessor.class);
-
+    /**
+     * Indicates configured mode of operation.
+     */
+    private final AllowDisallowMode mode; 
+    /**
+     * List of field match rules.
+     */
+    private final List<FieldMatchRule> rules;
 
     /**
      * Construct a AllowDisallowIndexingProcessor.
+     * @param mode AllowDisallowMode indicating the mode of operation.
+     * @param rules List of field match rule.
      * @param next Next UpdateRequestProcessor in the processor chain.
      */
-    public AllowDisallowIndexingProcessor(UpdateRequestProcessor next) {
+    public AllowDisallowIndexingProcessor(final AllowDisallowMode mode, final List<FieldMatchRule> rules, final UpdateRequestProcessor next) {
+	
         super(next);
+	this.mode = mode;
+	this.rules = rules;
     }
 
     /**
