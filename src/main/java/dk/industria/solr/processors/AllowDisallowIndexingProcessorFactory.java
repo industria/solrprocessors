@@ -1,8 +1,8 @@
 package dk.industria.solr.processors;
 
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +26,17 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * Logger
      */
     private static final Logger logger = LoggerFactory.getLogger(AllowDisallowIndexingProcessorFactory.class);
+
+
+    /**
+     * Mode configured
+     */
+    private AllowDisallowMode mode = AllowDisallowMode.UNKNOWN;
+
+    /**
+     * List of field match rules configured.
+     */
+    private List<FieldMatchRule> rules;
 
 
     /**
@@ -58,27 +69,49 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
             Map.Entry<String, ?> kv = itr.next();
             String key = kv.getKey();
             if(null == key) {
-            logger.warn("Item missing name attribute: " + kv.toString());
-            continue;
+                logger.warn("Item missing name attribute: " + kv.toString());
+                continue;
+            }
+
+            Object oValue = kv.getValue();
+            if(!(oValue instanceof String)) {
+                logger.warn("Item not a str element: " + kv.toString());
+                continue;
+            }
+
+            String value = ((String)oValue).trim();
+            if(0 == value.length()) {
+                logger.warn("Item trimmed value is empty: " + kv.toString());
+                continue;
+            }
+
+            logger.debug("Creating FieldMatchRule with: [" + key + "] [" + value + "]");
+            rules.add(new FieldMatchRule(key, value));
         }
-        Object oValue = kv.getValue();
-        if(!(oValue instanceof String)) {
-            logger.warn("Item not a str element: " + kv.toString());
-            continue;
+        if(logger.isDebugEnabled()) {
+            logger.debug(rules.toString());
         }
-        String value = ((String)oValue).trim();
-        if(0 == value.length()) {
-            logger.warn("Item value trimmed is an empty pattern: " + kv.toString());
-            continue;
-        }
-        logger.debug("Creating FieldMatchRule with: [" + key + "] [" + value + "]");
-        FieldMatchRule rule = new FieldMatchRule(key, value);
-        rules.add(rule);
+        return rules;
     }
-    if(logger.isDebugEnabled()) {
-        logger.debug(rules.toString());
+
+
+    /**
+     * Get the configured mode of operation.
+     * @return Mode of operation as a AllowDisallowMode enum.
+     */
+    public AllowDisallowMode getMode() {
+        return this.mode;
     }
-    return rules;
+
+    /**
+     * Get the list of field match rules configured.
+     * @return Unmodifiable list of rules.
+     */
+    public List<FieldMatchRule> getRules() {
+        if(null == rules) {
+            return Collections.EMPTY_LIST;
+        }
+        return Collections.unmodifiableList(rules);
     }
 
 
@@ -87,27 +120,29 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * 
      * @param args NamedList of parameters set in the processor definition (solrconfig.xml)
      */
-    public void init(final NamedList args) {
+    @Override public void init(final NamedList args) {
         if(logger.isDebugEnabled()) {
             logger.debug("ARGS: " + args.toString());
         }
 
-
         NamedList allow = getConfiguredList(args, "allow");
         if(null != allow) {
             logger.debug("Running with allow semantics: " + allow.toString());
-            List<FieldMatchRule> allowRules = getFieldMatchRules(allow);
+            this.mode = AllowDisallowMode.ALLOW;
+            this.rules = getFieldMatchRules(allow);
             return;
         }
 
         NamedList disallow = getConfiguredList(args, "disallow");
         if(null != disallow) {
             logger.debug("Running with disallow semantics: " + disallow.toString());
-            List<FieldMatchRule> disallowRules = getFieldMatchRules(disallow);
+            this.mode = AllowDisallowMode.DISALLOW;
+            this.rules = getFieldMatchRules(disallow);
             return;
         }
 
         logger.warn("Neither allow or disallow rules configured for the processor.");
+        this.mode = AllowDisallowMode.UNKNOWN;
     }
 
 
@@ -118,7 +153,9 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * @param next UpdateRequestProcessor
      * @return Instance of AllowDisallowIndexingProcessor initialized with the fields to process.
      */
-    public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
+    @Override public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
+        // TODO: Pass in allow mode, this.mode 
+        // TODO: Pass in rules, this.rules
         return new AllowDisallowIndexingProcessor(next);
     }
 
