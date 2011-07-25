@@ -23,8 +23,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 
 
-
-
 import org.apache.solr.update.AddUpdateCommand;
 
 import org.apache.solr.update.processor.UpdateRequestProcessor;
@@ -64,12 +62,12 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 
 
     /**
-        * Strip HTML/XML from string by reading it through the
-        * the Solr HTMLStripCharFilter.The string is also normalized
-        * with regards to spacing.
-       * @param text String containing HTML/XML to be stripped.
-       * @return  String with HTML/XML removed.
-       */
+     * Strip HTML/XML from string by reading it through the
+     * the Solr HTMLStripCharFilter.The string is also normalized
+     * with regards to spacing.
+     * @param text String containing HTML/XML to be stripped.
+     * @return  String with HTML/XML removed.
+     */
     private String htmlStripString(String text) {
 
         StringBuilder stripped = new StringBuilder();
@@ -102,9 +100,9 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
             logger.error("IOException thrown in HTML Stripper: " + ioe.toString());
         }
 
-    // The HTML strip filter replaces tags with spaces. Therefore the string
-    // should be processed to remove duplicate spaces in the string.
-    return removeDuplicateSpaces(stripped.toString());
+	// The HTML strip filter replaces tags with spaces. Therefore the string
+	// should be processed to remove duplicate spaces in the string.
+	return removeDuplicateSpaces(stripped.toString());
     }
 
 
@@ -126,51 +124,51 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     public void processAdd(AddUpdateCommand cmd) throws IOException {
 
 
-    // For all fields configured
-    for(String fieldName : this.fieldsToProcess) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("Processing field: " + fieldName);
-        }
+	// For all fields configured
+	for(String fieldName : this.fieldsToProcess) {
+	    if(logger.isDebugEnabled()) {
+		logger.debug("Processing field: " + fieldName);
+	    }
 
-        SolrInputDocument doc = cmd.getSolrInputDocument();
-        SolrInputField field = doc.getField(fieldName);
-        if(null == field) {
-            logger.debug("Field [" + fieldName + "] not in document.");
-            // proceed to next field
-            continue;
-        }
-        // Field was in document so time to process the value
-        logger.debug("Before update: " + field.toString());
-
-        Collection<Object> values = field.getValues();
-        if(null == values) {
+	    SolrInputDocument doc = cmd.getSolrInputDocument();
+	    SolrInputField field = doc.getField(fieldName);
+	    if(null == field) {
+		logger.debug("Field [" + fieldName + "] not in document.");
+		// proceed to next field
+		continue;
+	    }
+	    // Field was in document so time to process the value
+	    logger.debug("Before update: " + field.toString());
+	    
+	    Collection<Object> values = field.getValues();
+	    if(null == values) {
             logger.debug("Field [" + fieldName + "] returned null for values.");
             // proceed to next field
             continue;
-        }
-        // Process the field values
-        Collection<Object> newValues = new ArrayList<Object>();
-        for(Object value : values) {
-            logger.debug("Value: " + value.toString());
+	    }
+	    // Process the field values
+	    Collection<Object> newValues = new ArrayList<Object>();
+	    for(Object value : values) {
+		logger.debug("Value: " + value.toString());
+		
+		logger.debug(value.getClass().toString());
+		String strippedValue = htmlStripString((String)value);
+		
+		
+		newValues.add(strippedValue);
+	    }
+	    float boost = field.getBoost();
+	    field.setValue(newValues, boost);
+	    
+	    logger.debug("After update: " + field.toString());
+	}
 
-            logger.debug(value.getClass().toString());
-            String strippedValue = htmlStripString((String)value);
-
-
-            newValues.add(strippedValue);
-        }
-        float boost = field.getBoost();
-        field.setValue(newValues, boost);
-
-        logger.debug("After update: " + field.toString());
-    }
-
-
-
-    log.debug("Leaving processAdd");
-
-    // pass it up the chain
-    super.processAdd(cmd);
+	
+	
+	log.debug("Leaving processAdd");
+	
+	// pass it up the chain
+	super.processAdd(cmd);
     }
 
 
