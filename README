@@ -42,18 +42,25 @@ If more than one rule is supplied they are checked untill one of them matches or
 HTMLStripCharFilterProcessor
 ============================
 
-The HTMLStripCharFilterProcessor makes it possible to run the character filter HTMLStripCharFilter on a field before it's delivered to Solr for indexing. This can be especially convient when the application doing the indexing is not controlled by you. This can be a content management system sending fields with markup that you want to use for highligthing and therefore needs to markup removed for it to really be usable.
+The HTMLStripCharFilterProcessor makes it possible to run the character filter HTMLStripCharFilter on a field before it's delivered to Solr for indexing. This can be especially convient when the application doing the indexing is not controlled by you. This can be a content management system sending fields with markup that you want to use for highligthing and therefore need  markup removed for it to be usable.
+
+In addition to running HTMLStripCharFilter the processor:
+
+- Remove No-break spaces (unicode point: 00A0) from the result of HTMLStripCharFilter
+- Remove leading and trailing spaces from the result
+- Remove multiple continuous spaces from the result
+
+The above is not configurable/optional in the current version of the processor.
+
 
 You configure the HTMLStripCharFilterProcessor, in solrconfig.xml, as follows:
 
 1) Define a updateRequestProcessorChain as shown below
 
-<updateRequestProcessorChain name="fishy">
+<updateRequestProcessorChain name="customchain">
   <processor class="dk.industria.solr.processors.HTMLStripCharFilterProcessorFactory">
-    <str name="field">rubrik_text</str>
-    <str name="field">underrubrik_text</str>
-    <str name="field">broedtekst_text</str>
-    <str name="field">section</str> <!-- For debugging multi value fields -->
+    <str name="field">header</str>
+    <str name="field">content</str>
   </processor>
   <processor class="solr.LogUpdateProcessorFactory" />
   <processor class="solr.RunUpdateProcessorFactory" />
@@ -66,13 +73,10 @@ the <str name="field> elements allows you to configure the fields the processor 
 
 <requestHandler name="/update" class="solr.XmlUpdateRequestHandler">
   <lst name="defaults">
-    <str name="update.processor">fishy</str>
+    <str name="update.processor">customchain</str>
   </lst>
 </requestHandler>
 
 3) Make the JAR file available in the classpath. 
   
 If you are running Solr with multiple cores define a shared lib in the solr.xml and place the JAR in the folder. Solr will add the files in that folder to the classpath.
-
-
-   
