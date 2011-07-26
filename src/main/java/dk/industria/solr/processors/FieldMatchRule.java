@@ -23,6 +23,12 @@ class FieldMatchRule {
     private final Pattern pattern;
     
 
+    /**
+     * Get the field name of the match rule.
+     */ 
+    public String getField() {
+	return this.field;
+    }
 
     /**
      * Construct a FieldMatchRule.

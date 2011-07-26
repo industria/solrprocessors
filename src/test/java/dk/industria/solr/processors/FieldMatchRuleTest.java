@@ -48,6 +48,15 @@ public class FieldMatchRuleTest {
 	FieldMatchRule rule = FieldMatchRule.getInstance(field, pattern);
     }
 
+
+    @Test public void getFieldPassthrough() {
+	String fieldname = "content_type";
+	String pattern = "all_*";
+	FieldMatchRule rule = FieldMatchRule.getInstance(fieldname, pattern);
+	assertEquals(fieldname, rule.getField());
+    }
+
+
     /**
      * Testing toString format.
      */
