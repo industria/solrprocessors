@@ -1,37 +1,71 @@
 package dk.industria.solr.processors;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 
 /**
  * Represents a rule for matching field values.
  * Used by the AllowDisallowIndexingProcessor.
  */
-public class FieldMatchRule {
+class FieldMatchRule {
     /**
-     * Logger 
+     * Field to match the pattern against.
      */
-    private static final Logger logger = LoggerFactory.getLogger(FieldMatchRule.class);
-
-
-    private String field;
-
-    private String pattern;
+    private final String field;
+    /**
+     * The input pattern as a String
+     */
+    private final String inputPattern;
+    /**
+     * Pattern to match against the field.
+     */
+    private final Pattern pattern;
+    
 
 
     /**
      * Construct a FieldMatchRule.
-     * @param field Name of the file the rule should match.
-     * @param pattern Pattern to match on the field.
+     * @param field Field to match against.
+     * @param inputPattern String representation of the pattern.
+     * @param pattern Compiled version of inputPattern.
      */
-    public FieldMatchRule(String field, String pattern) {
-        this.field = field;
-        this.pattern = pattern;
+    private FieldMatchRule(String field, String inputPattern, Pattern pattern) {
+	this.field = field;
+	this.inputPattern = inputPattern;
+	this.pattern = pattern;
+    }
+
+    /**
+     * Create a new FieldMatchRule.
+     * @param field String with the field name to match the pattern against.
+     * @param pattern String containing a regular expression to match against the field.
+     * @return FieldMatchRule
+     * @throws IllegalArgumentExecption if the arguments does not compile into a legal pattern.
+     */
+    public static FieldMatchRule getInstance(final String field, final String pattern) throws IllegalArgumentException {
+	if(null == field) throw new IllegalArgumentException("field is null");
+	if(null == pattern) throw new IllegalArgumentException("pattern is null");
+	
+	Pattern compiledPattern;
+	try {
+	    compiledPattern = Pattern.compile(pattern);
+	} catch(PatternSyntaxException e) {
+	    String msg = "Failed to compile pattern [" + pattern + "] for field [" + field + "] : " + e.getMessage();
+	    throw new IllegalArgumentException(msg, e);
+	}
+
+	return new FieldMatchRule(field, pattern, compiledPattern);
     }
 
 
+
+
+    /**
+     * Returns a String representation of the field match rule.
+     * @return String representing the rule.
+     */
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append("Field: ");
@@ -42,7 +76,7 @@ public class FieldMatchRule {
         }
         s.append(" Pattern: ");
         if(null != this.pattern) {
-            s.append(this.pattern);
+            s.append(this.inputPattern);
         } else {
             s.append("null");
         }

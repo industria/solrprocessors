@@ -142,8 +142,8 @@ public class AllowDisallowIndexingProcessorFactoryTest {
         AllowDisallowIndexingProcessorFactory factory = initializedFactory(illegalRulesArg);
 
         List<FieldMatchRule> expectedRules = new ArrayList<FieldMatchRule>();
-        expectedRules.add(new FieldMatchRule("contenttype", "default"));
-        expectedRules.add(new FieldMatchRule("contenttype", "news"));
+        expectedRules.add(FieldMatchRule.getInstance("contenttype", "default"));
+        expectedRules.add(FieldMatchRule.getInstance("contenttype", "news"));
 
         List<FieldMatchRule> actualRules = factory.getRules();
 
