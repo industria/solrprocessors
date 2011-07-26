@@ -57,6 +57,17 @@ public class FieldMatchRuleTest {
     }
 
 
+    @Test public void matchValue() {
+	FieldMatchRule rule = FieldMatchRule.getInstance("content_type", "^\\d{2}$");
+	assertFalse(rule.match(null));
+	assertFalse(rule.match(""));
+	assertFalse(rule.match("a1b2"));
+	assertFalse(rule.match("a42x"));
+	assertTrue(rule.match("42"));
+    }
+
+
+
     /**
      * Testing toString format.
      */

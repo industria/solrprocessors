@@ -1,5 +1,6 @@
 package dk.industria.solr.processors;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -64,6 +65,19 @@ class FieldMatchRule {
 	return new FieldMatchRule(field, pattern, compiledPattern);
     }
 
+
+
+    /**
+     * Matches the field value against the pattern.
+     * @param fieldValue Value to test the pattern against.
+     * @return True if the pattern matches the field value.
+     */
+    public boolean match(String fieldValue) {
+	if(null == fieldValue) return false;
+
+	Matcher m = this.pattern.matcher(fieldValue);
+	return m.find();
+    }
 
 
 
