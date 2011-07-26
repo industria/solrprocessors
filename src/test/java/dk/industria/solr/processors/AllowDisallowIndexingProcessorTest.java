@@ -25,17 +25,20 @@ import org.apache.solr.update.AddUpdateCommand;
  */
 public class AllowDisallowIndexingProcessorTest {
     /**
-     * Create a configuration for allow mode with contenttype default rule..
-     * @return NamedList configured for allow mode.
+     * Create a configuration with contenttype default and news
+     * @param mode String to act as lst name attribute value
+     * @return NamedList configured for mode.
      */
-    private static NamedList createAllowConfig() {
+    private static NamedList createDefaultNewsConfig(String mode) {
         NamedList rules = new NamedList();
         rules.add("contenttype", "default");
+        rules.add("contenttype", "news");
 
         NamedList args = new NamedList();
-        args.add("allow", rules);
+        args.add(mode, rules);
         return args;
     }
+
 
     /**
      *  Create a update request processor with init arguments.
@@ -49,35 +52,42 @@ public class AllowDisallowIndexingProcessorTest {
         return factory.getInstance(null, null, next);
     }
 
+
     /**
      * Create a Solr input document with fields header, content and contenttype
-     * where contenttype is defailt.
-     * @return SolrInputDocument with a contenttype of default.
+     * where contenttype is set by the contenttype argument.
+     * @param contenttype The content type field value. 
+     * @return SolrInputDocument with a contenttype of the contenttype argument.
      */
-    private static SolrInputDocument createMatchDocument() {
+    private static SolrInputDocument createDocument(String contenttype) {
         SolrInputDocument document = new SolrInputDocument();
 
         document.addField("header", "Header without markup", 1f);
         document.addField("content", "<P>Content</P> <em>with</em> markup", 1f);
-        document.addField("contenttype", "default");
+        document.addField("contenttype", contenttype);
         return document;
     }
+
+
 
     /**
      * Checks the getInstance creates an UpdateRequestProcessor.
      */
     @Test
     public void instanceReturn() {
-        UpdateRequestProcessor processor = getProcessor(createAllowConfig(), null);
+        UpdateRequestProcessor processor = getProcessor(createDefaultNewsConfig("allow"), null);
         assertNotNull(processor);
     }
 
+    /**
+     * Allow mode field with a match and thereby catching a pass in the recorder
+     */
     @Test
     public void documentAllowMatch() {
         AddUpdateCommand cmd = new AddUpdateCommand();
-        cmd.solrDoc = createMatchDocument();
+        cmd.solrDoc = createDocument("default");
         AllowDisallowIndexingProcessorNext passRecorder = new AllowDisallowIndexingProcessorNext(null);
-        UpdateRequestProcessor processor = getProcessor(createAllowConfig(), passRecorder);
+        UpdateRequestProcessor processor = getProcessor(createDefaultNewsConfig("allow"), passRecorder);
 
         try {
             processor.processAdd(cmd);
@@ -85,8 +95,60 @@ public class AllowDisallowIndexingProcessorTest {
         } catch (IOException e) {
             fail(e.toString());
         }
+    }
 
+    /**
+     * Allow mode field without a match and thereby not catching a pass in the recorder
+     */
+    @Test
+    public void documentAllowNoMatch() {
+        AddUpdateCommand cmd = new AddUpdateCommand();
+        cmd.solrDoc = createDocument("person");
+        AllowDisallowIndexingProcessorNext passRecorder = new AllowDisallowIndexingProcessorNext(null);
+        UpdateRequestProcessor processor = getProcessor(createDefaultNewsConfig("allow"), passRecorder);
+
+        try {
+            processor.processAdd(cmd);
+            assertFalse(passRecorder.called);
+        } catch (IOException e) {
+            fail(e.toString());
+        }
     }
 
 
+    /**
+     * Disallow mode field with a match and thereby not catching a pass in the recorder
+     */
+    @Test
+    public void documentDisallowMatch() {
+        AddUpdateCommand cmd = new AddUpdateCommand();
+        cmd.solrDoc = createDocument("default");
+        AllowDisallowIndexingProcessorNext passRecorder = new AllowDisallowIndexingProcessorNext(null);
+        UpdateRequestProcessor processor = getProcessor(createDefaultNewsConfig("disallow"), passRecorder);
+
+        try {
+            processor.processAdd(cmd);
+            assertFalse(passRecorder.called);
+        } catch (IOException e) {
+            fail(e.toString());
+        }
+    }
+
+    /**
+     * Disallow mode field without a match and thereby catching a pass in the recorder
+     */
+    @Test
+    public void documentDisallowNoMatch() {
+        AddUpdateCommand cmd = new AddUpdateCommand();
+        cmd.solrDoc = createDocument("person");
+        AllowDisallowIndexingProcessorNext passRecorder = new AllowDisallowIndexingProcessorNext(null);
+        UpdateRequestProcessor processor = getProcessor(createDefaultNewsConfig("disallow"), passRecorder);
+
+        try {
+            processor.processAdd(cmd);
+            assertTrue(passRecorder.called);
+        } catch (IOException e) {
+            fail(e.toString());
+        }
+    }
 }

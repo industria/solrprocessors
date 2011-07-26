@@ -1,6 +1,7 @@
 package dk.industria.solr.processors;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
 
 
 import org.apache.solr.update.AddUpdateCommand;
@@ -53,9 +53,31 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
      * @return  True if one of the rules matched the document.
      */
     private static boolean rulesMatch(final List<FieldMatchRule> rules, final SolrInputDocument document) {
-        // TODO: Actually run the rules on the document.
-        //SolrInputField field = doc.getField(fieldName);
-        return true;
+	for(FieldMatchRule rule : rules) {
+	    String ruleField = rule.getField();
+	    logger.debug("Testing rule: " + rule.toString());
+
+	    // Get field from document
+	    Collection<Object> fieldValues = document.getFieldValues(ruleField);
+	    for(Object objectValue : fieldValues) {
+
+		// Only process String values
+		if(objectValue instanceof String) {
+		    String value = (String)objectValue;
+		    boolean match = rule.match(value);
+		    if(match) {
+			if(logger.isDebugEnabled()) {
+			    logger.debug("Matched rule [" + rule.toString() + "] on value [" + value + "]");  
+			}
+			return true;
+		    } 
+		} else {
+		    logger.debug("Value item for field [" + ruleField + "] is not a String");  
+		}
+	    }
+	}
+	// No field rules matched the document
+        return false;
     }
 
 
@@ -84,7 +106,8 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
                 return;
             }
 
-            logger.debug("Pass");
+	    logger.debug("Pass command up the processor chain");
+
             // pass it up the chain
             super.processAdd(cmd);
         }
