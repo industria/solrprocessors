@@ -92,7 +92,7 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
         while(itr.hasNext()) {
             Map.Entry<String, ?> kv = itr.next();
             String key = kv.getKey();
-            if(null == key) {
+            if((null == key) || (0 == key.trim().length())) {
                 logger.warn("Item missing name attribute: " + kv.toString());
                 continue;
             }

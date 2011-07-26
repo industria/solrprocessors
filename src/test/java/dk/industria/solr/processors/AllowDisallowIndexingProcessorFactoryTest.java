@@ -54,6 +54,7 @@ public class AllowDisallowIndexingProcessorFactoryTest {
         rules.add(null, "unnamed");
         rules.add("empty", "");
         rules.add("valuenull", null); 
+        rules.add("", "EmptyStringAttribute"); 
 
 
         NamedList args = new NamedList();
