@@ -24,18 +24,19 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 /**
  * Implements a factory for the AllowDisallowIndexingProcessor
  *
- * The main purpose of this is to process the init arguments into a list
- * of field match rules and a mode of operation.
+ * <p>The main purpose of this is to process the init arguments into a list
+ * of field match rules and a mode of operation.</p>
  *
- * Configuration is done by placing a lst element with in the processor element
+ * <p>Configuration is done by placing a lst element with in the processor element
  * with a name attribute set to either allow or disallow which indicates the mode
  * of operation. Within that lst element str elements with the name attribute set
- * to the field to match and the value to the matching rule.
+ * to the field to match and the value to the matching rule.</p>
  *
- * Example processor configuration with mode of operation set to allow and matching
+ * <p>Example processor configuration with mode of operation set to allow and matching
  * field rules contenttype = default and contenttype = news, which would index
- * all document with the field contenttype set to either default or news: 
+ * all document with the field contenttype set to either default or news:</p> 
  *
+ * <pre>
  * {@code
  * <processor class="dk.industria.solr.processors.AllowDisallowIndexingProcessorFactory">
  *   <lst name="allow">
@@ -44,6 +45,7 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
  *     </lst>
  * </processor>
  * }
+ * </pre>
  */
 public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactory {
     /**

@@ -20,21 +20,22 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 /**
  * Implements a factory for the HTMLStripCharFilterProcessor
  *
- * The main purpose of this is to process the init arguments into a list
- * of fields that should be processed with the HTMLStripCharFilterProcessor.
+ * <p>The main purpose of this is to process the init arguments into a list
+ * of fields that should be processed with the HTMLStripCharFilterProcessor.</p>
  *
- * Configuration is done by placing str elements with a name attribute set to field
- * and a element value set to the field that should be processed.
+ * <p>Configuration is done by placing str elements with a name attribute set to field
+ * and a element value set to the field that should be processed.</p>
  *
- * Example processor configuration for processing fields header and content:
+ * <p>Example processor configuration for processing fields header and content:</p>
  *
+ * <pre>
  * {@code
  * <processor class="dk.industria.solr.processors.HTMLStripCharFilterProcessorFactory">
  *   <str name="field">header</str>
  *   <str name="field">content</str>
  * </processor>
  * }
- *
+ * </pre>
  */
 public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory {
     /**
