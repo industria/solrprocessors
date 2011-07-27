@@ -18,13 +18,14 @@ class FieldMatchRule {
      * Pattern to match against the field.
      */
     private final Pattern pattern;
-    
+
 
     /**
      * Get the field name of the match rule.
+     * @return Field name of the match field.
      */ 
     public String getField() {
-	return this.field;
+        return this.field;
     }
 
     /**
@@ -33,8 +34,8 @@ class FieldMatchRule {
      * @param pattern Compiled version of inputPattern.
      */
     private FieldMatchRule(String field, Pattern pattern) {
-	this.field = field;
-	this.pattern = pattern;
+        this.field = field;
+        this.pattern = pattern;
     }
 
     /**
@@ -42,21 +43,21 @@ class FieldMatchRule {
      * @param field String with the field name to match the pattern against.
      * @param pattern String containing a regular expression to match against the field.
      * @return FieldMatchRule
-     * @throws IllegalArgumentExecption if the arguments does not compile into a legal pattern.
+     * @throws IllegalArgumentException if the arguments does not compile into a legal pattern.
      */
     public static FieldMatchRule getInstance(final String field, final String pattern) throws IllegalArgumentException {
-	if(null == field) throw new IllegalArgumentException("field is null");
-	if(null == pattern) throw new IllegalArgumentException("pattern is null");
-	
-	Pattern compiledPattern;
-	try {
-	    compiledPattern = Pattern.compile(pattern);
-	} catch(PatternSyntaxException e) {
-	    String msg = "Failed to compile pattern [" + pattern + "] for field [" + field + "] : " + e.getMessage();
-	    throw new IllegalArgumentException(msg, e);
-	}
+        if(null == field) throw new IllegalArgumentException("field is null");
+        if(null == pattern) throw new IllegalArgumentException("pattern is null");
 
-	return new FieldMatchRule(field, compiledPattern);
+        Pattern compiledPattern;
+        try {
+            compiledPattern = Pattern.compile(pattern);
+        } catch(PatternSyntaxException e) {
+            String msg = "Failed to compile pattern [" + pattern + "] for field [" + field + "] : " + e.getMessage();
+            throw new IllegalArgumentException(msg, e);
+        }
+
+        return new FieldMatchRule(field, compiledPattern);
     }
 
 
@@ -67,10 +68,10 @@ class FieldMatchRule {
      * @return True if the pattern matches the field value.
      */
     public boolean match(String fieldValue) {
-	if(null == fieldValue) return false;
+        if(null == fieldValue) return false;
 
-	Matcher m = this.pattern.matcher(fieldValue);
-	return m.find();
+        Matcher m = this.pattern.matcher(fieldValue);
+        return m.find();
     }
 
 
@@ -87,15 +88,13 @@ class FieldMatchRule {
         } else {
             s.append("null");
         }
-	s.append(" =~ m/");
+        s.append(" =~ m/");
         if(null != this.pattern) {
             s.append(this.pattern.toString());
         } else {
             s.append("null");
         }
-	s.append("/");
+        s.append("/");
         return s.toString();
     }
-
-
 }
