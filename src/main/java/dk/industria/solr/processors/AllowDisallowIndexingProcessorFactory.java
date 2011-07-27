@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 
+import org.apache.solr.core.SolrCore;
+import org.apache.solr.schema.IndexSchema;
+import org.apache.solr.schema.SchemaField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +129,19 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
         return rules;
     }
 
+    /**
+     * Get the name of the unique key defined for the schema.
+     * @param request SolrQueryRequest
+     * @return  String containing the name of the schema unique key or null it one is not defined.
+     * */
+    private String uniqueKey(SolrQueryRequest request) {
+        if(null == request) return null;
+
+        SolrCore core = request.getCore();
+        IndexSchema schema = core.getSchema();
+        SchemaField field = schema.getUniqueKeyField();
+        return (null != field) ? field.getName() : null;
+    }
 
     /**
      * Get the configured mode of operation.
@@ -195,7 +211,8 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
             dbg.append("]");
             logger.debug(dbg.toString());
         }
-        return new AllowDisallowIndexingProcessor(this.mode, this.rules, next);
+        String uniqueFieldName = uniqueKey(req);
+        return new AllowDisallowIndexingProcessor(this.mode, this.rules, uniqueFieldName, next);
     }
 
 
