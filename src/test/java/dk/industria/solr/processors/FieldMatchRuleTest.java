@@ -75,7 +75,7 @@ public class FieldMatchRuleTest {
         FieldMatchRule fmr = FieldMatchRule.getInstance("field", "matchPattern");
         String result = fmr.toString();
 
-        assertEquals("Field: field Pattern: matchPattern", result);
+        assertEquals("field =~ m/matchPattern/", result);
     }
 
 

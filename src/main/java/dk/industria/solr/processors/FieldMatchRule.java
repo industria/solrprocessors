@@ -15,10 +15,6 @@ class FieldMatchRule {
      */
     private final String field;
     /**
-     * The input pattern as a String
-     */
-    private final String inputPattern;
-    /**
      * Pattern to match against the field.
      */
     private final Pattern pattern;
@@ -34,12 +30,10 @@ class FieldMatchRule {
     /**
      * Construct a FieldMatchRule.
      * @param field Field to match against.
-     * @param inputPattern String representation of the pattern.
      * @param pattern Compiled version of inputPattern.
      */
-    private FieldMatchRule(String field, String inputPattern, Pattern pattern) {
+    private FieldMatchRule(String field, Pattern pattern) {
 	this.field = field;
-	this.inputPattern = inputPattern;
 	this.pattern = pattern;
     }
 
@@ -62,7 +56,7 @@ class FieldMatchRule {
 	    throw new IllegalArgumentException(msg, e);
 	}
 
-	return new FieldMatchRule(field, pattern, compiledPattern);
+	return new FieldMatchRule(field, compiledPattern);
     }
 
 
@@ -88,18 +82,18 @@ class FieldMatchRule {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("Field: ");
         if(null != this.field) {
             s.append(this.field);
         } else {
             s.append("null");
         }
-        s.append(" Pattern: ");
+	s.append(" =~ m/");
         if(null != this.pattern) {
-            s.append(this.inputPattern);
+            s.append(this.pattern.toString());
         } else {
             s.append("null");
         }
+	s.append("/");
         return s.toString();
     }
 
