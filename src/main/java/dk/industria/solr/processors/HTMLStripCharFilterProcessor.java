@@ -72,7 +72,7 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      *
      * @param text String containing HTML/XML to be stripped.
      * @return String with HTML/XML removed.
-     * @throws IOException
+     * @throws IOException  if reading the string through the HTMLStripCharFilter.
      */
     private String htmlStripString(String text) throws IOException {
         Reader r = new StringReader(text);
