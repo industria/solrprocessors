@@ -19,15 +19,15 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 
 /**
  * Implements a factory for the HTMLStripCharFilterProcessor
- *
+ * <p/>
  * <p>The main purpose of this is to process the init arguments into a list
  * of fields that should be processed with the HTMLStripCharFilterProcessor.</p>
- *
+ * <p/>
  * <p>Configuration is done by placing str elements with a name attribute set to field
  * and a element value set to the field that should be processed.</p>
- *
+ * <p/>
  * <p>Example processor configuration for processing fields header and content:</p>
- *
+ * <p/>
  * <pre>
  * {@code
  * <processor class="dk.industria.solr.processors.HTMLStripCharFilterProcessorFactory">
@@ -47,103 +47,82 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      */
     private List<String> fieldsToProcess;
 
-
     /**
      * Generate a string containing the fields configured, the string is
      * on the form {field1} {field2} ... {fieldn}
+     *
      * @param fields The fields for the field string.
      * @return String on the form {field1} {field2} ... {fieldn}
      */
     private static String configuredFieldsString(List<String> fields) {
         StringBuilder sb = new StringBuilder();
-        for(String field : fields) {
-            sb.append(" {");
-            sb.append(field);
-            sb.append("}");
+        for (String field : fields) {
+            sb.append(" {").append(field).append("}");
         }
         return sb.toString();
     }
 
-
     /**
      * Extract field names from init arguments.
      * That is fields with a key of field and a type of String.
+     *
      * @param initArguments NamedList containing the init arguments.
      * @return List of field names.
      */
     private static List<String> extractFields(final NamedList initArguments) {
-	List<String> fieldNames = new ArrayList<String>();
-	List valuesWithField = initArguments.getAll("field");
-	for(Object value : valuesWithField) {
-	    if(value instanceof String) {
-		String valueToAdd = ((String)value).trim();
-		if(0 < valueToAdd.length()) {
-		    if(logger.isDebugEnabled()) {
-			logger.debug("Adding field, with value [" + valueToAdd + "]");
-		    }
-		    fieldNames.add(valueToAdd);
-		} else {
-		    logger.warn("Misconfigured field, trim length 0 with value [" + value.toString() +"]");
-		}
-	    } else {
-		if(null == value) {
-		    logger.warn("Misconfigured field, with value [null]");
-		} else {
-		    logger.warn("Misconfigured field, type [" + value.getClass().getName() + "] with value [" + value.toString() +"]");
-		}
-	    }
-	}
-	return fieldNames;
+        List<String> fieldNames = new ArrayList<String>();
+        List valuesWithField = initArguments.getAll("field");
+        for (Object value : valuesWithField) {
+            if (value instanceof String) {
+                String valueToAdd = ((String) value).trim();
+                if (0 < valueToAdd.length()) {
+                    logger.debug("Adding field, with value [{}]", valueToAdd);
+                    fieldNames.add(valueToAdd);
+                }
+            }
+        }
+        return fieldNames;
     }
-
 
     /**
      * Get the list of field names configured for processing.
+     *
      * @return Unmodifiable list of field names configured.
      */
     public List<String> getFields() {
-	if (null == fieldsToProcess) {
-        return Collections.unmodifiableList(new ArrayList<String>());
-	}
-	return Collections.unmodifiableList(fieldsToProcess);
+        if (null == fieldsToProcess) {
+            return Collections.unmodifiableList(new ArrayList<String>());
+        }
+        return Collections.unmodifiableList(fieldsToProcess);
     }
-
-
 
     /**
-     * Init called by SOLR processor chain
+     * Init called by Solr processor chain
      * The values configured for keys field is extracted to fieldsToProcess.
-     * @param args NamedList of parameters set in the processor definition (solrconfig.xml)
+     *
+     * @param args NamedList of parameters set in the processor definition in solrconfig.xml
      */
-    @Override public void init(final NamedList args) {
+    @Override
+    public void init(final NamedList args) {
         this.fieldsToProcess = extractFields(args);
 
-	if(logger.isDebugEnabled()) {
-            String fls = configuredFieldsString(this.fieldsToProcess);
-            logger.debug("Configured with fields [" + fls + "]");
-        }
+        logger.debug("Configured with fields [{}]", configuredFieldsString(this.fieldsToProcess));
 
-        if(this.fieldsToProcess.isEmpty()) {
-            logger.warn("No fields configured");
+        if (this.fieldsToProcess.isEmpty()) {
+            logger.warn("No fields configured. Consider removing the processor.");
         }
     }
-
 
     /**
      * Factory method for the HTMLStripCharFilterProcessor called by SOLR processor chain.
-     * @param req SolrQueryRequest
-     * @param rsp SolrQueryResponse
+     *
+     * @param req  SolrQueryRequest
+     * @param rsp  SolrQueryResponse
      * @param next UpdateRequestProcessor
      * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
      */
-    @Override public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-        if(logger.isDebugEnabled()) {
-            String fls = configuredFieldsString(this.fieldsToProcess);
-            logger.debug("Create HTMLStripCharFilterProcessor with fields:" + fls);
-        }
-        return new HTMLStripCharFilterProcessor(this.fieldsToProcess, next);
+    @Override
+    public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
+        return new HTMLStripCharFilterProcessor(fieldsToProcess, next);
     }
-
-
-
 }

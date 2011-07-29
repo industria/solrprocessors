@@ -1,6 +1,5 @@
 package dk.industria.solr.processors;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -45,7 +44,6 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * Size of the buffer used to read the input through the HTMLStripCharFilter.
      */
     private static final int BUFFER_SIZE = 4096;
-
     /**
      * List of fields to process with the HTMLStripCharFilter.
      */
@@ -74,8 +72,9 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      *
      * @param text String containing HTML/XML to be stripped.
      * @return String with HTML/XML removed.
+     * @throws IOException
      */
-    private String htmlStripString(String text) {
+    private String htmlStripString(String text) throws IOException {
         Reader r = new StringReader(text);
         if (!r.markSupported()) {
             logger.debug("Reader returned false for mark support, wrapped in BufferedReader.");
@@ -97,14 +96,14 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
                 }
             }
             filter.close();
-        } catch (IOException ioe) {
-            logger.error("IOException thrown in HTML Stripper: " + ioe.toString());
+        } catch (IOException e) {
+            logger.error("IOException thrown in HTML Stripper: {}", e.toString());
+            throw e;
         }
         // The HTML strip filter replaces tags with spaces. Therefore the string
         // should be processed to remove duplicate spaces in the string.
         return removeDuplicateSpaces(stripped.toString());
     }
-
 
     /**
      * Construct a HTMLStripCharFilterProcessor.
@@ -127,23 +126,14 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     @Override
     public void processAdd(AddUpdateCommand cmd) throws IOException {
         SolrInputDocument doc = cmd.getSolrInputDocument();
-        // For all configured fields
         for (String fieldName : this.fieldsToProcess) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Processing field: " + fieldName);
-            }
+            logger.debug("Processing field: {}", fieldName);
 
             SolrInputField field = doc.getField(fieldName);
-            if (null == field) {
-                logger.debug("Field [" + fieldName + "] not in document.");
-                continue;
-            }
+            if (null == field) continue;
 
             Collection<Object> values = field.getValues();
-            if (null == values) {
-                logger.debug("Field [" + fieldName + "] returned null for values.");
-                continue;
-            }
+            if (null == values) continue;
 
             Collection<Object> newValues = new ArrayList<Object>();
             for (Object value : values) {
@@ -151,17 +141,12 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
                     String strippedValue = htmlStripString((String) value);
                     newValues.add(strippedValue);
                 } else {
-                    logger.info("Field value not processed: [" + fieldName + "] value [" + value + "] is not a String");
                     newValues.add(value);
                 }
             }
             float boost = field.getBoost();
             field.setValue(newValues, boost);
-
         }
-        // pass it up the chain
         super.processAdd(cmd);
     }
-
-
 }

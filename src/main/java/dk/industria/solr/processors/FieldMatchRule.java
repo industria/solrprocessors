@@ -4,10 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-
 /**
- * Represents a rule for matching field values.
- * Used by the AllowDisallowIndexingProcessor.
+ * Represents a rule for matching field values
+ * <p>Used by the @see AllowDisallowIndexingProcessor.</p>.
  */
 class FieldMatchRule {
     /**
@@ -19,8 +18,7 @@ class FieldMatchRule {
      */
     private final Pattern pattern;
 
-
-    /**
+   /**
      * Get the field name of the match rule.
      * @return Field name of the match field.
      */ 
@@ -49,18 +47,14 @@ class FieldMatchRule {
         if(null == field) throw new IllegalArgumentException("field is null");
         if(null == pattern) throw new IllegalArgumentException("pattern is null");
 
-        Pattern compiledPattern;
         try {
-            compiledPattern = Pattern.compile(pattern);
+            Pattern compiledPattern = Pattern.compile(pattern);
+            return new FieldMatchRule(field, compiledPattern);
         } catch(PatternSyntaxException e) {
             String msg = "Failed to compile pattern [" + pattern + "] for field [" + field + "] : " + e.getMessage();
             throw new IllegalArgumentException(msg, e);
         }
-
-        return new FieldMatchRule(field, compiledPattern);
     }
-
-
 
     /**
      * Matches the field value against the pattern.
@@ -74,26 +68,16 @@ class FieldMatchRule {
         return m.find();
     }
 
-
-
-    /**
+  /**
      * Returns a String representation of the field match rule.
      * @return String representing the rule.
      */
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        if(null != this.field) {
-            s.append(this.field);
-        } else {
-            s.append("null");
-        }
+        s.append(field);
         s.append(" =~ m/");
-        if(null != this.pattern) {
-            s.append(this.pattern.toString());
-        } else {
-            s.append("null");
-        }
+        s.append(pattern);
         s.append("/");
         return s.toString();
     }

@@ -11,7 +11,12 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.update.AddUpdateCommand;
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 
-
+/**
+ * <p>Implements an UpdateRequestProcessor for filtering documents based on allow/disallow rules
+ * matching regular expressions in field values.
+ * <p/>
+ * For more information @see AllowDisallowIndexingProcessorFactory
+ */
 public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
     /**
      * Logger
@@ -58,93 +63,67 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
      */
     private static boolean rulesMatch(final List<FieldMatchRule> rules, final SolrInputDocument document) {
         for (FieldMatchRule rule : rules) {
-            String ruleField = rule.getField();
-            logger.debug("Testing rule: " + rule.toString());
+            logger.debug("Testing rule: {}", String.valueOf(rule));
 
-            // Get field from document
+            String ruleField = rule.getField();
             Collection<Object> fieldValues = document.getFieldValues(ruleField);
             for (Object objectValue : fieldValues) {
-
-                // Only process String values
                 if (objectValue instanceof String) {
                     String value = (String) objectValue;
-                    boolean match = rule.match(value);
-                    if (match) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Matched rule [" + rule.toString() + "] on value [" + value + "]");
-                        }
+                    if (rule.match(value)) {
+                        logger.debug("Matched rule [{}] on value [{}]", String.valueOf(rule), value);
                         return true;
                     }
-                } else {
-                    logger.debug("Value item for field [" + ruleField + "] is not a String");
                 }
             }
         }
-        // No field rules matched the document
+        // No rules matched
         return false;
     }
 
     /**
-     * Generate a discarded info log message taking mode and unique key into consideration.
+     * Get the value of the documents unique key.
      *
-     * @param document SolrInputDocument for retrieving the document id.
-     * @return String containing the discarded message.
+     * @param document SolrInputDocument to get the value from.
+     * @return String representation of the documents unique value key.
      */
-    private String discardInfoMessage(final SolrInputDocument document) {
-        StringBuilder msg = new StringBuilder();
+    private String uniqueKeyValue(final SolrInputDocument document) {
+        if (null == this.uniqueKey) return "";
 
-        msg.append("Document id [");
-        if (null != this.uniqueKey) {
-            Object oValue = document.getFieldValue(this.uniqueKey);
-            msg.append(oValue);
-        }
-        msg.append("] discarded - ");
-
-        if (this.mode == AllowDisallowMode.ALLOW) {
-            msg.append("allow mode without rule match");
-        } else if (this.mode == AllowDisallowMode.DISALLOW) {
-            msg.append("disallow mode with rule match");
-        }
-
-        return msg.toString();
+        Object value = document.getFieldValue(this.uniqueKey);
+        return String.valueOf(value);
     }
-
 
     /**
      * Called by the processor chain on document add/update operations.
      * This is where we check the allow / disallow rules.
      *
      * @param cmd AddUpdateCommand
+     * @throws IOException
      */
     @Override
     public void processAdd(AddUpdateCommand cmd) throws IOException {
         if (this.mode == AllowDisallowMode.UNKNOWN) {
-            logger.warn("Mode UNKNOWN, pass command up the chain");
+            logger.warn("Mode UNKNOWN, indexing, check configuration!");
             super.processAdd(cmd);
         } else {
             SolrInputDocument document = cmd.getSolrInputDocument();
             boolean match = rulesMatch(this.rules, document);
 
             if ((this.mode == AllowDisallowMode.ALLOW) && (!match)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info(discardInfoMessage(document));
-                }
+                logger.info("DocId [{}] discarded - allow mode without rule match", uniqueKeyValue(document));
                 return;
             }
 
             if ((this.mode == AllowDisallowMode.DISALLOW) && (match)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info(discardInfoMessage(document));
-                }
+                logger.info("DocId [{}] discarded - disallow mode with rule match", uniqueKeyValue(document));
                 return;
             }
 
-            logger.debug("Pass command up the processor chain");
+            logger.info("DocId [{}] indexing", uniqueKeyValue(document));
 
-            // pass it up the chain
             super.processAdd(cmd);
         }
     }
-
 
 }
