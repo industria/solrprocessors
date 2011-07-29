@@ -29,15 +29,15 @@ import org.apache.solr.update.processor.UpdateRequestProcessor;
 
 /**
  * Implements an UpdateRequestProcessor for running Solr HTMLStripCharFilter on
- * select document fields before they are stored. 
- *
+ * select document fields before they are stored.
+ * <p/>
  * For more information @see HTMLStripCharFilterProcessorFactory
- */  
+ */
 public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     /**
-     * Logger 
+     * Logger
      * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
-     * which makes controlling log output from this project difficult unless a different 
+     * which makes controlling log output from this project difficult unless a different
      * logger is used as in this case.
      */
     private static final Logger logger = LoggerFactory.getLogger(HTMLStripCharFilterProcessor.class);
@@ -54,11 +54,12 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     /**
      * Removes duplicate spaces from a string.
      * TODO: Also removes no break space which should be moved out
+     *
      * @param text String possibly containing duplicate spaces.
      * @return String with duplicate spaces removed.
      */
     private String removeDuplicateSpaces(String text) {
-       if(null == text) return "";
+        if (null == text) return "";
         String trimmed = text.trim();
         // Strip out No-break space
         String charStripped = trimmed.replaceAll("\u00A0", " ");
@@ -70,12 +71,13 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * Strip HTML/XML from string by reading it through the
      * the Solr HTMLStripCharFilter.The string is also normalized
      * with regards to spacing.
+     *
      * @param text String containing HTML/XML to be stripped.
-     * @return  String with HTML/XML removed.
+     * @return String with HTML/XML removed.
      */
     private String htmlStripString(String text) {
         Reader r = new StringReader(text);
-        if(!r.markSupported()) {
+        if (!r.markSupported()) {
             logger.debug("Reader returned false for mark support, wrapped in BufferedReader.");
             r = new BufferedReader(r);
         }
@@ -85,17 +87,17 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
         try {
             char[] buffer = new char[BUFFER_SIZE];
             HTMLStripCharFilter filter = new HTMLStripCharFilter(cs);
-            while(true) {
+            while (true) {
                 int nCharsRead = filter.read(buffer);
-                if(-1 == nCharsRead) {
+                if (-1 == nCharsRead) {
                     break;
                 }
-                if(0 < nCharsRead) {
+                if (0 < nCharsRead) {
                     stripped.append(buffer, 0, nCharsRead);
                 }
             }
             filter.close();
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             logger.error("IOException thrown in HTML Stripper: " + ioe.toString());
         }
         // The HTML strip filter replaces tags with spaces. Therefore the string
@@ -106,8 +108,9 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
 
     /**
      * Construct a HTMLStripCharFilterProcessor.
+     *
      * @param fields List of field names to process.
-     * @param next Next UpdateRequestProcessor in the processor chain.
+     * @param next   Next UpdateRequestProcessor in the processor chain.
      */
     public HTMLStripCharFilterProcessor(final List<String> fields, final UpdateRequestProcessor next) {
         super(next);
@@ -117,50 +120,48 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     /**
      * Called by the processor chain on document add/update opeations.
      * This is where we process the fields configured before they are indexed.
+     *
      * @param cmd AddUpdateCommand
      * @throws IOException
      */
-    @Override public void processAdd(AddUpdateCommand cmd) throws IOException {
-    SolrInputDocument doc = cmd.getSolrInputDocument();
-    // For all configured fields
-    for(String fieldName : this.fieldsToProcess) {
-        if(logger.isDebugEnabled()) {
-        logger.debug("Processing field: " + fieldName);
-        }
+    @Override
+    public void processAdd(AddUpdateCommand cmd) throws IOException {
+        SolrInputDocument doc = cmd.getSolrInputDocument();
+        // For all configured fields
+        for (String fieldName : this.fieldsToProcess) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Processing field: " + fieldName);
+            }
 
-        SolrInputField field = doc.getField(fieldName);
-        if(null == field) {
-        logger.debug("Field [" + fieldName + "] not in document.");
-        continue;
-        }
+            SolrInputField field = doc.getField(fieldName);
+            if (null == field) {
+                logger.debug("Field [" + fieldName + "] not in document.");
+                continue;
+            }
 
-        logger.debug("Before update: " + field.toString());
+            Collection<Object> values = field.getValues();
+            if (null == values) {
+                logger.debug("Field [" + fieldName + "] returned null for values.");
+                continue;
+            }
 
-        Collection<Object> values = field.getValues();
-        if(null == values) {
-        logger.debug("Field [" + fieldName + "] returned null for values.");
-        continue;
-        }
+            Collection<Object> newValues = new ArrayList<Object>();
+            for (Object value : values) {
+                if (value instanceof String) {
+                    String strippedValue = htmlStripString((String) value);
+                    newValues.add(strippedValue);
+                } else {
+                    logger.info("Field value not processed: [" + fieldName + "] value [" + value + "] is not a String");
+                    newValues.add(value);
+                }
+            }
+            float boost = field.getBoost();
+            field.setValue(newValues, boost);
 
-        Collection<Object> newValues = new ArrayList<Object>();
-        for(Object value : values) {
-        if(value instanceof String) {
-            String strippedValue = htmlStripString((String)value);
-            newValues.add(strippedValue);
-        } else {
-            logger.info("Field value not processed: [" + fieldName + "] value [" + value + "] is not a String");
-            newValues.add(value);
         }
-        }
-        float boost = field.getBoost();
-        field.setValue(newValues, boost);
-
-        logger.debug("After update: " + field.toString());
+        // pass it up the chain
+        super.processAdd(cmd);
     }
-    // pass it up the chain
-    super.processAdd(cmd);
-    }
-
 
 
 }
