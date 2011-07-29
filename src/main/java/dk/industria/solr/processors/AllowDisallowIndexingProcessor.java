@@ -30,16 +30,17 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
     private final List<FieldMatchRule> rules;
 
     /**
-     *  Name of the schema unique key, null if one is not defined for the schema.
+     * Name of the schema unique key, null if one is not defined for the schema.
      */
     private final String uniqueKey;
+
     /**
      * Construct a AllowDisallowIndexingProcessor.
      *
-     * @param mode  AllowDisallowMode indicating the mode of operation.
-     * @param rules List of field match rule.
+     * @param mode      AllowDisallowMode indicating the mode of operation.
+     * @param rules     List of field match rule.
      * @param uniqueKey Name of the document unique key. Null is no unique key is defined in the schema.
-     * @param next  Next UpdateRequestProcessor in the processor chain.
+     * @param next      Next UpdateRequestProcessor in the processor chain.
      */
     public AllowDisallowIndexingProcessor(final AllowDisallowMode mode, final List<FieldMatchRule> rules, final String uniqueKey, final UpdateRequestProcessor next) {
         super(next);
@@ -50,9 +51,10 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
 
     /**
      * Indicates if running the rules results on a match in the document.
-     * @param rules List of field match rules to run against the document.
+     *
+     * @param rules    List of field match rules to run against the document.
      * @param document SolrInputDocument to run rules against.
-     * @return  True if one of the rules matched the document.
+     * @return True if one of the rules matched the document.
      */
     private static boolean rulesMatch(final List<FieldMatchRule> rules, final SolrInputDocument document) {
         for (FieldMatchRule rule : rules) {
@@ -84,6 +86,7 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
 
     /**
      * Generate a discarded info log message taking mode and unique key into consideration.
+     *
      * @param document SolrInputDocument for retrieving the document id.
      * @return String containing the discarded message.
      */
@@ -91,21 +94,20 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
         StringBuilder msg = new StringBuilder();
 
         msg.append("Document id [");
-        if(null != this.uniqueKey) {
+        if (null != this.uniqueKey) {
             Object oValue = document.getFieldValue(this.uniqueKey);
             msg.append(oValue);
         }
         msg.append("] discarded - ");
 
-        if(this.mode == AllowDisallowMode.ALLOW) {
+        if (this.mode == AllowDisallowMode.ALLOW) {
             msg.append("allow mode without rule match");
-        } else if(this.mode == AllowDisallowMode.DISALLOW) {
+        } else if (this.mode == AllowDisallowMode.DISALLOW) {
             msg.append("disallow mode with rule match");
         }
 
         return msg.toString();
     }
-
 
 
     /**
@@ -116,28 +118,28 @@ public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
      */
     @Override
     public void processAdd(AddUpdateCommand cmd) throws IOException {
-        if(this.mode == AllowDisallowMode.UNKNOWN) {
+        if (this.mode == AllowDisallowMode.UNKNOWN) {
             logger.warn("Mode UNKNOWN, pass command up the chain");
             super.processAdd(cmd);
         } else {
             SolrInputDocument document = cmd.getSolrInputDocument();
             boolean match = rulesMatch(this.rules, document);
 
-            if((this.mode == AllowDisallowMode.ALLOW) && (!match)) {
-                if(logger.isInfoEnabled()) {
+            if ((this.mode == AllowDisallowMode.ALLOW) && (!match)) {
+                if (logger.isInfoEnabled()) {
                     logger.info(discardInfoMessage(document));
                 }
                 return;
             }
 
-            if((this.mode == AllowDisallowMode.DISALLOW) && (match)) {
-                if(logger.isInfoEnabled()) {
+            if ((this.mode == AllowDisallowMode.DISALLOW) && (match)) {
+                if (logger.isInfoEnabled()) {
                     logger.info(discardInfoMessage(document));
                 }
                 return;
             }
 
-	    logger.debug("Pass command up the processor chain");
+            logger.debug("Pass command up the processor chain");
 
             // pass it up the chain
             super.processAdd(cmd);
