@@ -36,15 +36,15 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
  * to the field to match and the value to the matching rule.</p>
  * <p/>
  * <p>Example processor configuration with mode of operation set to allow and matching
- * field rules contenttype = default and contenttype = news, which would index
- * all document with the field contenttype set to either default or news:</p>
+ * field rules content_type = default and content_type = news, which would index
+ * all document with the field content_type set to either default or news:</p>
  * <p/>
  * <pre>
  * {@code
  * <processor class="dk.industria.solr.processors.AllowDisallowIndexingProcessorFactory">
  *   <lst name="allow">
- *     <str name="contenttype">default</str>
- *     <str name="contenttype">news</str>
+ *     <str name="content_type">default</str>
+ *     <str name="content_type">news</str>
  *     </lst>
  * </processor>
  * }

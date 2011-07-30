@@ -32,7 +32,7 @@ import org.apache.solr.update.processor.UpdateRequestProcessor;
  * <p/>
  * For more information @see HTMLStripCharFilterProcessorFactory
  */
-public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
+class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     /**
      * Logger
      * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
@@ -117,7 +117,7 @@ public class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     }
 
     /**
-     * Called by the processor chain on document add/update opeations.
+     * Called by the processor chain on document add/update operations.
      * This is where we process the fields configured before they are indexed.
      *
      * @param cmd AddUpdateCommand

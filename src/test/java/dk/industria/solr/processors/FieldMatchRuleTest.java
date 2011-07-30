@@ -15,7 +15,7 @@ public class FieldMatchRuleTest {
      * Test a legal FieldMatchRule getInstance call.
      */
     @Test
-    public void getInstanceLegelTest() {
+    public void getInstanceLegalTest() {
         String field = "content_type";
         String pattern = "default";
         FieldMatchRule rule = FieldMatchRule.getInstance(field, pattern);
@@ -29,7 +29,7 @@ public class FieldMatchRuleTest {
     public void getInstanceIllegalNullFieldTest() {
         String field = null;
         String pattern = "default";
-        FieldMatchRule rule = FieldMatchRule.getInstance(field, pattern);
+        FieldMatchRule.getInstance(field, pattern);
     }
 
     /**
@@ -39,7 +39,7 @@ public class FieldMatchRuleTest {
     public void getInstanceIllegalNullPatternTest() {
         String field = "content_type";
         String pattern = null;
-        FieldMatchRule rule = FieldMatchRule.getInstance(field, pattern);
+        FieldMatchRule.getInstance(field, pattern);
     }
 
     /**
@@ -49,16 +49,16 @@ public class FieldMatchRuleTest {
     public void getInstanceIllegalPatternTest() {
         String field = "content_type";
         String pattern = "(fi+";
-        FieldMatchRule rule = FieldMatchRule.getInstance(field, pattern);
+        FieldMatchRule.getInstance(field, pattern);
     }
 
 
     @Test
-    public void getFieldPassthrough() {
-        String fieldname = "content_type";
+    public void getFieldPassThrough() {
+        String fieldName = "content_type";
         String pattern = "all_*";
-        FieldMatchRule rule = FieldMatchRule.getInstance(fieldname, pattern);
-        assertEquals(fieldname, rule.getField());
+        FieldMatchRule rule = FieldMatchRule.getInstance(fieldName, pattern);
+        assertEquals(fieldName, rule.getField());
     }
 
 

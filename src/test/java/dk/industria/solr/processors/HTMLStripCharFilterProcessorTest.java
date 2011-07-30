@@ -29,7 +29,7 @@ public class HTMLStripCharFilterProcessorTest {
      * @return UpdateRequestProcessor (HTMLStripCharFilterProcessor)
      */
     private static UpdateRequestProcessor headerContentProcessor() {
-        NamedList input = new NamedList();
+        NamedList<String> input = new NamedList<String>();
         input.add("field", "header");
         input.add("field", "content");
 
@@ -43,7 +43,7 @@ public class HTMLStripCharFilterProcessorTest {
     /**
      * Create a SolrInputDocument containing two fields header and content
      * Field header : Doesn't contain any markup
-     * Field conent : Contains markup
+     * Field content : Contains markup
      *
      * @return SolrInputDocument with fields header and content.
      */
@@ -60,11 +60,11 @@ public class HTMLStripCharFilterProcessorTest {
     /**
      * Create a SolrInputDocument containing two fields header and content
      * Field header : Doesn't contain any markup
-     * Field conent : Contains markup in multivalues
+     * Field content : Contains markup in multiple values
      *
      * @return SolrInputDocument with fields header and content.
      */
-    private static SolrInputDocument createDocumentWithMarkupMultiValue() {
+    private static SolrInputDocument createDocumentWithMarkupMultipleValue() {
         SolrInputDocument document = new SolrInputDocument();
 
         document.addField("header", "Header without markup", 1f);
@@ -80,11 +80,11 @@ public class HTMLStripCharFilterProcessorTest {
     /**
      * Create a SolrInputDocument containing two fields header and content
      * Field header : Doesn't contain any markup
-     * Field conent : Contains markup in multivalues
+     * Field content : Contains markup in multiple values
      *
      * @return SolrInputDocument with fields header and content.
      */
-    private static SolrInputDocument createDocumentWithMarkupMultiValueNoBreakSpaces() {
+    private static SolrInputDocument createDocumentWithMarkupMultipleValueNoBreakSpaces() {
         SolrInputDocument document = new SolrInputDocument();
 
         document.addField("header", "Header without markup", 1f);
@@ -134,14 +134,14 @@ public class HTMLStripCharFilterProcessorTest {
 
     /**
      * Process a document where header doesn't contain any markup but the content does
-     * see createDocumentWithMarkupMultiValue for document content.
+     * see createDocumentWithMarkupMultipleValue for document content.
      */
     @Test
     public void markupNoneHeaderInContentMultivalued() {
         UpdateRequestProcessor processor = headerContentProcessor();
 
         AddUpdateCommand cmd = new AddUpdateCommand();
-        cmd.solrDoc = createDocumentWithMarkupMultiValue();
+        cmd.solrDoc = createDocumentWithMarkupMultipleValue();
 
         try {
             processor.processAdd(cmd);
@@ -162,14 +162,14 @@ public class HTMLStripCharFilterProcessorTest {
     /**
      * Process a document where header doesn't contain any markup the content does
      * and it also contains no-break spaces
-     * see createDocumentWithMarkupMultiValueNoBreakSpaces for document content.
+     * see createDocumentWithMarkupMultipleValueNoBreakSpaces for document content.
      */
     @Test
     public void markupNoneHeaderInContentMultivaluedNoBreak() {
         UpdateRequestProcessor processor = headerContentProcessor();
 
         AddUpdateCommand cmd = new AddUpdateCommand();
-        cmd.solrDoc = createDocumentWithMarkupMultiValueNoBreakSpaces();
+        cmd.solrDoc = createDocumentWithMarkupMultipleValueNoBreakSpaces();
 
         try {
             processor.processAdd(cmd);

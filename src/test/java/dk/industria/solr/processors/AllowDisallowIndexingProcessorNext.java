@@ -13,7 +13,7 @@ import java.io.IOException;
  * passed the command up the chain.
  * Used in AllowDisallowIndexingProcessorTest.
  */
-public class AllowDisallowIndexingProcessorNext extends UpdateRequestProcessor {
+class AllowDisallowIndexingProcessorNext extends UpdateRequestProcessor {
     /**
      * Logger
      */

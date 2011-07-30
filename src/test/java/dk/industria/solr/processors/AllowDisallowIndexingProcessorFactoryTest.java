@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -28,13 +29,14 @@ public class AllowDisallowIndexingProcessorFactoryTest {
 
     /**
      * Create a configuration for allow mode.
+     *
      * @return NamedList configured for allow mode.
      */
     private static NamedList createAllowConfig() {
-        NamedList rules = new NamedList();
-        rules.add("contenttype", "default");
+        NamedList<String> rules = new NamedList<String>();
+        rules.add("content_type", "default");
 
-        NamedList args = new NamedList();
+        NamedList<NamedList> args = new NamedList<NamedList>();
         args.add("allow", rules);
         return args;
     }
@@ -42,53 +44,57 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     /**
      * Create a configuration for allow mode with illegal rules
      * that should be filtered by the factory.
+     *
      * @return NamedList configured for allow mode with illegal rules..
      */
     private static NamedList createAllowWithIllegalConfig() {
-        NamedList rules = new NamedList();
-        rules.add("contenttype", "default");
-        rules.add("contenttype", "news");
-        rules.add("illegalInteger", Integer.valueOf(100));
+        NamedList<Object> rules = new NamedList<Object>();
+        rules.add("content_type", "default");
+        rules.add("content_type", "news");
+        rules.add("illegalInteger", 100);
         rules.add(null, null);
-        rules.add("listtype", new NamedList());
+        rules.add("list_type", new NamedList());
         rules.add(null, "unnamed");
         rules.add("empty", "");
-        rules.add("valuenull", null); 
-        rules.add("", "EmptyStringAttribute"); 
-	rules.add("content_type", "(fi+");
+        rules.add("value_null", null);
+        rules.add("", "EmptyStringAttribute");
+        rules.add("content_type", "(fi+");
 
-        NamedList args = new NamedList();
+        NamedList<NamedList> args = new NamedList<NamedList>();
         args.add("allow", rules);
         return args;
     }
 
     /**
      * Create a configuration for disallow mode.
+     *
      * @return NamedList configured for disallow mode.
      */
     private static NamedList createDisallowConfig() {
         NamedList rules = new NamedList();
 
-        NamedList args = new NamedList();
+        NamedList<NamedList> args = new NamedList<NamedList>();
         args.add("disallow", rules);
         return args;
     }
 
     /**
-     * Create a configuration for with name other that allow or disallow (nomode)  mode.
+     * Create a configuration for with name other that allow or disallow (no_mode)  mode.
+     *
      * @return NamedList configured for no mode.
      */
     private static NamedList createUnknownValueConfig() {
         NamedList rules = new NamedList();
 
-        NamedList args = new NamedList();
-        args.add("nomode", rules);
+        NamedList<NamedList> args = new NamedList<NamedList>();
+        args.add("no_mode", rules);
         return args;
     }
 
 
     /**
      * Get an initialized factory
+     *
      * @param args The arguments to initialize the factory with.
      * @return AllowDisallowIndexingProcessorFactory initialized with args.
      */
@@ -99,9 +105,10 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     }
 
     /**
-     * Test calling properties on unconfigured factory.
+     * Test calling properties on factory that is not configured..
      */
-    @Test public void modeAndRulesUnconfigured() {
+    @Test
+    public void modeAndRulesNotConfigured() {
         AllowDisallowIndexingProcessorFactory factory = new AllowDisallowIndexingProcessorFactory();
         assertEquals(AllowDisallowMode.UNKNOWN, factory.getMode());
         List<FieldMatchRule> rules = factory.getRules();
@@ -110,9 +117,10 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     }
 
     /**
-     * Configured with allow mode arguments 
+     * Configured with allow mode arguments
      */
-    @Test public void modeAfterInitAllow() {
+    @Test
+    public void modeAfterInitAllow() {
         AllowDisallowIndexingProcessorFactory factory = initializedFactory(createAllowConfig());
         assertEquals(AllowDisallowMode.ALLOW, factory.getMode());
     }
@@ -120,7 +128,8 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     /**
      * Configured with disallow mode arguments
      */
-    @Test public void modeAfterInitDisallow() {
+    @Test
+    public void modeAfterInitDisallow() {
         AllowDisallowIndexingProcessorFactory factory = initializedFactory(createDisallowConfig());
         assertEquals(AllowDisallowMode.DISALLOW, factory.getMode());
     }
@@ -128,7 +137,8 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     /**
      * Configured with disallow mode arguments
      */
-    @Test public void modeAfterInitNomode() {
+    @Test
+    public void modeAfterInitNoMode() {
         AllowDisallowIndexingProcessorFactory factory = initializedFactory(createUnknownValueConfig());
         assertEquals(AllowDisallowMode.UNKNOWN, factory.getMode());
     }
@@ -137,13 +147,14 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     /**
      * Args containing illegal entries should be filtered by the factory.
      */
-    @Test public void illegalRulesFiltered() {
+    @Test
+    public void illegalRulesFiltered() {
         NamedList illegalRulesArg = createAllowWithIllegalConfig();
         AllowDisallowIndexingProcessorFactory factory = initializedFactory(illegalRulesArg);
 
         List<FieldMatchRule> expectedRules = new ArrayList<FieldMatchRule>();
-        expectedRules.add(FieldMatchRule.getInstance("contenttype", "default"));
-        expectedRules.add(FieldMatchRule.getInstance("contenttype", "news"));
+        expectedRules.add(FieldMatchRule.getInstance("content_type", "default"));
+        expectedRules.add(FieldMatchRule.getInstance("content_type", "news"));
 
         List<FieldMatchRule> actualRules = factory.getRules();
 

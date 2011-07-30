@@ -25,16 +25,16 @@ import org.apache.solr.update.AddUpdateCommand;
  */
 public class AllowDisallowIndexingProcessorTest {
     /**
-     * Create a configuration with contenttype default and news
+     * Create a configuration with content_type default and news
      * @param mode String to act as lst name attribute value
      * @return NamedList configured for mode.
      */
     private static NamedList createDefaultNewsConfig(String mode) {
-        NamedList rules = new NamedList();
-        rules.add("contenttype", "default");
-        rules.add("contenttype", "news");
+        NamedList<String> rules = new NamedList<String>();
+        rules.add("content_type", "default");
+        rules.add("content_type", "news");
 
-        NamedList args = new NamedList();
+        NamedList<NamedList> args = new NamedList<NamedList>();
         args.add(mode, rules);
         return args;
     }
@@ -54,21 +54,19 @@ public class AllowDisallowIndexingProcessorTest {
 
 
     /**
-     * Create a Solr input document with fields header, content and contenttype
-     * where contenttype is set by the contenttype argument.
-     * @param contenttype The content type field value. 
-     * @return SolrInputDocument with a contenttype of the contenttype argument.
+     * Create a Solr input document with fields header, content and content_type
+     * where content_type is set by the content_type argument.
+     * @param contentType The content type field value.
+     * @return SolrInputDocument with a content_type of the content_type argument.
      */
-    private static SolrInputDocument createDocument(String contenttype) {
+    private static SolrInputDocument createDocument(String contentType) {
         SolrInputDocument document = new SolrInputDocument();
 
         document.addField("header", "Header without markup", 1f);
         document.addField("content", "<P>Content</P> <em>with</em> markup", 1f);
-        document.addField("contenttype", contenttype);
+        document.addField("content_type", contentType);
         return document;
     }
-
-
 
     /**
      * Checks the getInstance creates an UpdateRequestProcessor.

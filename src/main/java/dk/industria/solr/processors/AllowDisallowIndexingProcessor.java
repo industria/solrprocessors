@@ -17,7 +17,7 @@ import org.apache.solr.update.processor.UpdateRequestProcessor;
  * <p/>
  * For more information @see AllowDisallowIndexingProcessorFactory
  */
-public class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
+class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
     /**
      * Logger
      * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,

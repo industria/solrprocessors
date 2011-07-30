@@ -49,10 +49,10 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
 
     /**
      * Generate a string containing the fields configured, the string is
-     * on the form {field1} {field2} ... {fieldn}
+     * on the form {field1} {field2} ... {fieldN}
      *
      * @param fields The fields for the field string.
-     * @return String on the form {field1} {field2} ... {fieldn}
+     * @return String on the form {field1} {field2} ... {fieldN}
      */
     private static String configuredFieldsString(List<String> fields) {
         StringBuilder sb = new StringBuilder();
