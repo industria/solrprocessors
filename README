@@ -1,6 +1,47 @@
 Solr processors
 
-Implements processors for use in the Solr update request processor chain.
+Implements update request processors for use in the Solr update request processor chain.
+
+============
+Installation
+============
+1) Make the project jar-file running "mvn package".
+
+2) Make the jar-file available in the classpath.
+   If you are running Solr with multiple cores, define a shared lib in the solr.xml
+   and place the jar-file in that folder. Solr will add the files in that folder to
+   the classpath on startup.
+
+3) Define an update request processor chain with the processors needed.
+   Below is an example with four processor factories AllowDisallowIndexingProcessorFactory,
+   HTMLStripCharFilterProcessorFactory, LogUpdateProcessorFactory and RunUpdateProcessorFactory.
+
+   <updateRequestProcessorChain name="customChain">
+     <processor class="dk.industria.solr.processors.AllowDisallowIndexingProcessorFactory">
+       <lst name="allow">
+         <str name="content_type">article</str>
+       </lst>
+     </processor>
+     <processor class="dk.industria.solr.processors.HTMLStripCharFilterProcessorFactory">
+       <str name="field">header</str>
+       <str name="field">content</str>
+     </processor>
+     <processor class="solr.LogUpdateProcessorFactory" />
+     <processor class="solr.RunUpdateProcessorFactory" />
+   </updateRequestProcessorChain>
+
+4) Register the processor chain with your update request handler as shown below
+
+   <requestHandler name="/update" class="solr.XmlUpdateRequestHandler">
+     <lst name="defaults">
+       <str name="update.processor">customChain</str>
+     </lst>
+   </requestHandler>
+
+
+==========
+Processors
+==========
 
 The project contains the following processors:
 
@@ -11,53 +52,69 @@ The project contains the following processors:
 ==============================
 AllowDisallowIndexingProcessor
 ==============================
+The AllowDisallowIndexingProcessor makes it possible to configure rules based on
+field content for deciding whether or not a given document should be indexed or not.
 
-The AllowDisallowIndexingProcessor makes it possible to configure rules based on field content for deciding whether or not a given document should be indexed or not.
+The use case for this processor:
+A system, for instance a content management system, pushes documents to be indexed to Solr
+and you don't want all the document types to be indexed. An example of this use case is using
+the Escenic indexer-webapp to create a site search index.
 
-The use case for processor:
-A system not under your control pushes documents to be indexed and you don't want all the document types in the index. 
+The processor is configured by supplying the <lst> element with a name attribute
+indicating the semantics of the processor, which can be either allow or disallow.
 
-An example of this use case is Escenics indexer-webapp.
+The semantics work as follows:
 
+allow    : Index documents matching at least one rule in the list, dropping everything else.
+disallow : Index documents that doesn't match any rules in the list.
 
-The processor is configured by supplying the lst element with a name indicating the semantics of the processor, which can be either allow or disallow. The semantics work as follows:
+Rules are defined by using the <str> element giving the field to check in the name attribute
+and the match rule (regular expression) as the value of the element.
 
-allow : Indexes documents matching at least one rule in the list, dropping everything else.
+Example allow rule indexing documents with a field content_type set to article:
 
-disallow : Indexes documents that doesn't match any rules in the list.
+<updateRequestProcessorChain name="customChain">
+  <processor class="dk.industria.solr.processors.AllowDisallowIndexingProcessorFactory">
+    <lst name="allow">
+      <str name="content_type">article</str>
+    </lst>
+  </processor>
+  <processor class="solr.LogUpdateProcessorFactory" />
+  <processor class="solr.RunUpdateProcessorFactory" />
+</updateRequestProcessorChain>
 
-Rules are defined by using the str element giving the field to check in the name attribute and the match rule as the value of the element.
+<requestHandler name="/update" class="solr.XmlUpdateRequestHandler">
+  <lst name="defaults">
+    <str name="update.processor">customChain</str>
+  </lst>
+</requestHandler>
 
-Example allow rule only indexing documents with a field contenttype set to article
-
-<lst name="allow">
-  <str name="contenttype">article</str>
-</lst>
- 
-If more than one rule is supplied they are checked untill one of them matches or none of them matched.
-
+If more than one rule is defined they will be tested one by one until either one of
+them match (declaring a match) or none of the matched (declaring no match) that is
+more rules work as logical or.
 
 
 ============================
 HTMLStripCharFilterProcessor
 ============================
+The HTMLStripCharFilterProcessor makes it possible to run the Solr character filter
+HTMLStripCharFilter on a field before it's delivered to Solr for indexing. This can
+be especially convenient when the application doing the indexing is not under you control.
 
-The HTMLStripCharFilterProcessor makes it possible to run the character filter HTMLStripCharFilter on a field before it's delivered to Solr for indexing. This can be especially convient when the application doing the indexing is not controlled by you. This can be a content management system sending fields with markup that you want to use for highligthing and therefore need  markup removed for it to be usable.
+This could be a content management system sending fields with markup that you want to use
+for highlighting and therefore need the markup removed before the field is stored in the index.
 
-In addition to running HTMLStripCharFilter the processor:
+In addition to running HTMLStripCharFilter the processor will:
 
-- Remove No-break spaces (unicode point: 00A0) from the result of HTMLStripCharFilter
+- Remove no-break spaces (unicode point: 00A0) from the result of HTMLStripCharFilter
 - Remove leading and trailing spaces from the result
 - Remove multiple continuous spaces from the result
 
-The above is not configurable/optional in the current version of the processor.
+The above is not configurable in the current version of the processor.
 
+An Example configuration of the HTMLStripCharFilterProcessor:
 
-You configure the HTMLStripCharFilterProcessor, in solrconfig.xml, as follows:
-
-1) Define a updateRequestProcessorChain as shown below
-
-<updateRequestProcessorChain name="customchain">
+<updateRequestProcessorChain name="customChain">
   <processor class="dk.industria.solr.processors.HTMLStripCharFilterProcessorFactory">
     <str name="field">header</str>
     <str name="field">content</str>
@@ -66,17 +123,8 @@ You configure the HTMLStripCharFilterProcessor, in solrconfig.xml, as follows:
   <processor class="solr.RunUpdateProcessorFactory" />
 </updateRequestProcessorChain>
 
-the <str name="field> elements allows you to configure the fields the processor will run HTMLStripCharFilter on.
-
-
-2) Register the processor chain with your update request handler as shown below
-
 <requestHandler name="/update" class="solr.XmlUpdateRequestHandler">
   <lst name="defaults">
-    <str name="update.processor">customchain</str>
+    <str name="update.processor">customChain</str>
   </lst>
 </requestHandler>
-
-3) Make the JAR file available in the classpath. 
-  
-If you are running Solr with multiple cores define a shared lib in the solr.xml and place the JAR in the folder. Solr will add the files in that folder to the classpath.
