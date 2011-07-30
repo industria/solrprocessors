@@ -4,7 +4,7 @@ package dk.industria.solr.processors;
  * Indicate the mode of operation.
  * @see AllowDisallowIndexingProcessor
  */
-public enum AllowDisallowMode {
+enum AllowDisallowMode {
     /**
      * Indicates the mode of operation is unknown.
      *
