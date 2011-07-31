@@ -50,41 +50,41 @@ class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     private final List<String> fieldsToProcess;
 
     /**
-     * Removes duplicate spaces from a string.
-     * TODO: Also removes no break space which should be moved out
+     * Space normalizes the string by changing no-break space into normal spaces,
+     * trimming the string for leading and trailing spaces and finally removing
+     * duplicate spaces from the string.
      *
-     * @param text String possibly containing duplicate spaces.
-     * @return String with duplicate spaces removed.
+     * @param text String to space normalize..
+     * @return String with normalized spaces..
      */
-    private String removeDuplicateSpaces(String text) {
+    private String normalizeSpace(String text) {
         if (null == text) return "";
-        String trimmed = text.trim();
-        // Strip out No-break space
-        String charStripped = trimmed.replaceAll("\u00A0", " ");
-        return charStripped.replaceAll("\\p{Space}{2,}", " ");
+        // Replace no-break space
+        String noBreakRemoved = text.replaceAll("\u00A0", " ");
+        String trimmed = noBreakRemoved.trim();
+        // Replace multiple recurring spaces with a single space
+        return trimmed.replaceAll("\\p{Space}{2,}", " ");
     }
 
-
     /**
-     * Strip HTML/XML from string by reading it through the
-     * the Solr HTMLStripCharFilter.The string is also normalized
-     * with regards to spacing.
+     * Strip HTML/XML from string by reading it through the Solr HTMLStripCharFilter.
      *
      * @param text String containing HTML/XML to be stripped.
      * @return String with HTML/XML removed.
      * @throws IOException  if reading the string through the HTMLStripCharFilter.
      */
-    private String htmlStripString(String text) throws IOException {
-        Reader r = new StringReader(text);
-        if (!r.markSupported()) {
-            logger.debug("Reader returned false for mark support, wrapped in BufferedReader.");
-            r = new BufferedReader(r);
-        }
-        CharStream cs = CharReader.get(r);
-
+    private String runHtmlStripCharFilter(String text) throws IOException {
         StringBuilder stripped = new StringBuilder();
         try {
             char[] buffer = new char[BUFFER_SIZE];
+
+            Reader r = new StringReader(text);
+            if (!r.markSupported()) {
+                logger.debug("Reader returned false for mark support, wrapped in BufferedReader.");
+                r = new BufferedReader(r);
+            }
+
+            CharStream cs = CharReader.get(r);
             HTMLStripCharFilter filter = new HTMLStripCharFilter(cs);
             while (true) {
                 int nCharsRead = filter.read(buffer);
@@ -97,12 +97,10 @@ class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
             }
             filter.close();
         } catch (IOException e) {
-            logger.error("IOException thrown in HTML Stripper: {}", e.toString());
+            logger.error("IOException thrown in HTMLStripCharFilter: {}", e.toString());
             throw e;
         }
-        // The HTML strip filter replaces tags with spaces. Therefore the string
-        // should be processed to remove duplicate spaces in the string.
-        return removeDuplicateSpaces(stripped.toString());
+        return stripped.toString();
     }
 
     /**
@@ -138,8 +136,9 @@ class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
             Collection<Object> newValues = new ArrayList<Object>();
             for (Object value : values) {
                 if (value instanceof String) {
-                    String strippedValue = htmlStripString((String) value);
-                    newValues.add(strippedValue);
+                    String strippedValue = runHtmlStripCharFilter((String) value);
+                    String normalizedValue = normalizeSpace(strippedValue);
+                    newValues.add(normalizedValue);
                 } else {
                     newValues.add(value);
                 }
