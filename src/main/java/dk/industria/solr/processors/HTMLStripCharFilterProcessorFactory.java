@@ -26,6 +26,9 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
  * Configuration is done by placing str elements with a name attribute set to field
  * and a element value set to the name of the field that should be processed.
  * <p/>
+ * The space normalization done by the processor can be turned off by placing
+ * a bool element with name attribute of normalize set to false.
+ * <p/>
  * Example processor configuration for processing fields header and content:
  * <p/>
  * <pre>
@@ -33,6 +36,7 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
  * <processor class="dk.industria.solr.processors.HTMLStripCharFilterProcessorFactory">
  *   <str name="field">header</str>
  *   <str name="field">content</str>
+ *   <bool name="normalize">true</bool>
  * </processor>
  * }
  * </pre>
@@ -46,6 +50,10 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      * List of fields configured for HTML character stripping.
      */
     private List<String> fieldsToProcess;
+    /**
+     * Indicates if spaces should be normalized after running HTMLStripCharFilter.
+     */
+    private boolean spaceNormalize = true;
 
     /**
      * Generate a string containing the fields configured, the string is
@@ -85,6 +93,20 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
     }
 
     /**
+     * Extract space normalization setting from boolean with key normalize.
+     * <p/>
+     * If a bool element with normalize name attribute does not exists in
+     * the arguments it will default to true.
+     *
+     * @param initArguments NamedList containing the init arguments.
+     * @return True if space normalization should be turned on.
+     */
+    private static boolean extractSpaceNormalization(final NamedList initArguments) {
+        Object oValue = initArguments.get("normalize");
+        return (oValue instanceof Boolean) ? (Boolean)oValue : true;
+    }
+
+    /**
      * Get the list of field names configured for processing.
      *
      * @return Unmodifiable list of field names configured.
@@ -97,6 +119,15 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
     }
 
     /**
+     * Get space normalization setting.
+     *
+     * @return True is space normalization should be performed in the processor.
+     */
+    public boolean getNormalize() {
+        return this.spaceNormalize;
+    }
+
+    /**
      * Init called by Solr processor chain
      * The values configured for keys field is extracted to fieldsToProcess.
      *
@@ -104,6 +135,10 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      */
     @Override
     public void init(final NamedList args) {
+        this.spaceNormalize = extractSpaceNormalization(args);
+
+        logger.debug("Configured with space normalization set to: {}", String.valueOf(this.spaceNormalize));
+
         this.fieldsToProcess = extractFields(args);
 
         logger.debug("Configured with fields [{}]", configuredFieldsString(this.fieldsToProcess));
@@ -123,6 +158,6 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      */
     @Override
     public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-        return new HTMLStripCharFilterProcessor(fieldsToProcess, next);
+        return new HTMLStripCharFilterProcessor(fieldsToProcess, spaceNormalize, next);
     }
 }

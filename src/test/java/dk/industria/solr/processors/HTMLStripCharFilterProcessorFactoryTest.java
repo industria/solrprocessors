@@ -70,8 +70,6 @@ public class HTMLStripCharFilterProcessorFactoryTest {
         List<String> expectedFields = expectedHeaderContent();
 
         assertTrue(compareFieldLists(actualFields, expectedFields));
-
-        //        UpdateRequestProcessor processor = factory.getInstance(null, null, null);
     }
 
     /**
@@ -128,6 +126,54 @@ public class HTMLStripCharFilterProcessorFactoryTest {
         List<String> actualFields = factory.getFields();
         assertNotNull(actualFields);
         assertEquals(0, actualFields.size());
+
+    }
+
+    /**
+     * Test the the space normalization is the default.
+     */
+    @Test
+    public void defaultSpaceNormalization() {
+        NamedList<Object> input = new NamedList<Object>();
+        input.add("field", "header");
+        input.add("field", "content");
+
+        HTMLStripCharFilterProcessorFactory factory = new HTMLStripCharFilterProcessorFactory();
+        factory.init(input);
+
+        assertTrue(factory.getNormalize());
+    }
+
+    /**
+     * Test the the space normalization is the default.
+     */
+    @Test
+    public void spaceNormalizationTurnedOn() {
+        NamedList<Object> input = new NamedList<Object>();
+        input.add("field", "header");
+        input.add("field", "content");
+        input.add("normalize", true);
+
+        HTMLStripCharFilterProcessorFactory factory = new HTMLStripCharFilterProcessorFactory();
+        factory.init(input);
+
+        assertTrue(factory.getNormalize());
+    }
+
+    /**
+     * Test the the space normalization is the default.
+     */
+    @Test
+    public void spaceNormalizationTurnedOff() {
+        NamedList<Object> input = new NamedList<Object>();
+        input.add("field", "header");
+        input.add("field", "content");
+        input.add("normalize", false);
+
+        HTMLStripCharFilterProcessorFactory factory = new HTMLStripCharFilterProcessorFactory();
+        factory.init(input);
+
+        assertFalse(factory.getNormalize());
 
     }
 

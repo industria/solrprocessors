@@ -110,7 +110,8 @@ In addition to running HTMLStripCharFilter the processor will:
 - Remove leading and trailing spaces from the result
 - Remove multiple continuous spaces from the result
 
-The above is not configurable in the current version of the processor.
+The above can be turned off by placing a bool element with a name attribute set
+to normalize and a value of false.
 
 An Example configuration of the HTMLStripCharFilterProcessor:
 
@@ -118,6 +119,7 @@ An Example configuration of the HTMLStripCharFilterProcessor:
   <processor class="dk.industria.solr.processors.HTMLStripCharFilterProcessorFactory">
     <str name="field">header</str>
     <str name="field">content</str>
+    <bool name="normalize">true</bool>
   </processor>
   <processor class="solr.LogUpdateProcessorFactory" />
   <processor class="solr.RunUpdateProcessorFactory" />

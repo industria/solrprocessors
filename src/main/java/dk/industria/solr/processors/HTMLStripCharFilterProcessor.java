@@ -30,7 +30,11 @@ import org.apache.solr.update.processor.UpdateRequestProcessor;
  * Implements an UpdateRequestProcessor for running Solr HTMLStripCharFilter on
  * select document fields before they are stored.
  * <p/>
- * For more information @see HTMLStripCharFilterProcessorFactory
+ *  In addition to running the HTMLStringCharFilter it also space normalizes the fields
+ *  by removing no-break spaces, trimming leading and trailing spaces and finally
+ *  replaces multiple recurring spaces with a single space.
+ * <p/>
+ * For more information on configuration @see HTMLStripCharFilterProcessorFactory
  */
 class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
     /**
@@ -48,7 +52,10 @@ class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * List of fields to process with the HTMLStripCharFilter.
      */
     private final List<String> fieldsToProcess;
-
+    /**
+     * Indicates if field values should be space normalized after running the filter.
+     */
+    private final boolean spaceNormalize;
     /**
      * Space normalizes the string by changing no-break space into normal spaces,
      * trimming the string for leading and trailing spaces and finally removing
@@ -107,11 +114,13 @@ class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
      * Construct a HTMLStripCharFilterProcessor.
      *
      * @param fields List of field names to process.
+     * @param spaceNormalize Set to true if field values should be space normalized.
      * @param next   Next UpdateRequestProcessor in the processor chain.
      */
-    public HTMLStripCharFilterProcessor(final List<String> fields, final UpdateRequestProcessor next) {
+    public HTMLStripCharFilterProcessor(final List<String> fields, final boolean spaceNormalize, final UpdateRequestProcessor next) {
         super(next);
         this.fieldsToProcess = fields;
+        this.spaceNormalize = spaceNormalize;
     }
 
     /**
@@ -136,9 +145,11 @@ class HTMLStripCharFilterProcessor extends UpdateRequestProcessor {
             Collection<Object> newValues = new ArrayList<Object>();
             for (Object value : values) {
                 if (value instanceof String) {
-                    String strippedValue = runHtmlStripCharFilter((String) value);
-                    String normalizedValue = normalizeSpace(strippedValue);
-                    newValues.add(normalizedValue);
+                    String newValue = runHtmlStripCharFilter((String) value);
+                    if(this.spaceNormalize) {
+                        newValue = normalizeSpace(newValue);
+                    }
+                    newValues.add(newValue);
                 } else {
                     newValues.add(value);
                 }

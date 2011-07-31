@@ -28,17 +28,19 @@ public class HTMLStripCharFilterProcessorTest {
      *
      * @return UpdateRequestProcessor (HTMLStripCharFilterProcessor)
      */
-    private static UpdateRequestProcessor headerContentProcessor() {
-        NamedList<String> input = new NamedList<String>();
+    private static UpdateRequestProcessor headerContentProcessor(boolean normalize) {
+        NamedList<Object> input = new NamedList<Object>();
         input.add("field", "header");
         input.add("field", "content");
+        if(!normalize) {
+            input.add("normalize", false);
+        }
 
         HTMLStripCharFilterProcessorFactory factory = new HTMLStripCharFilterProcessorFactory();
         factory.init(input);
 
         return factory.getInstance(null, null, null);
     }
-
 
     /**
      * Create a SolrInputDocument containing two fields header and content
@@ -103,7 +105,7 @@ public class HTMLStripCharFilterProcessorTest {
      */
     @Test
     public void instanceReturn() {
-        UpdateRequestProcessor processor = headerContentProcessor();
+        UpdateRequestProcessor processor = headerContentProcessor(true);
         assertNotNull(processor);
     }
 
@@ -114,7 +116,7 @@ public class HTMLStripCharFilterProcessorTest {
      */
     @Test
     public void markupNoneHeaderInContent() {
-        UpdateRequestProcessor processor = headerContentProcessor();
+        UpdateRequestProcessor processor = headerContentProcessor(true);
 
         AddUpdateCommand cmd = new AddUpdateCommand();
         cmd.solrDoc = createDocumentWithMarkup();
@@ -138,7 +140,7 @@ public class HTMLStripCharFilterProcessorTest {
      */
     @Test
     public void markupNoneHeaderInContentMultivalued() {
-        UpdateRequestProcessor processor = headerContentProcessor();
+        UpdateRequestProcessor processor = headerContentProcessor(true);
 
         AddUpdateCommand cmd = new AddUpdateCommand();
         cmd.solrDoc = createDocumentWithMarkupMultipleValue();
@@ -166,7 +168,7 @@ public class HTMLStripCharFilterProcessorTest {
      */
     @Test
     public void markupNoneHeaderInContentMultivaluedNoBreak() {
-        UpdateRequestProcessor processor = headerContentProcessor();
+        UpdateRequestProcessor processor = headerContentProcessor(true);
 
         AddUpdateCommand cmd = new AddUpdateCommand();
         cmd.solrDoc = createDocumentWithMarkupMultipleValueNoBreakSpaces();
@@ -187,6 +189,32 @@ public class HTMLStripCharFilterProcessorTest {
             fail(e.toString());
         }
     }
+
+
+    /**
+      * Process a document where header doesn't contain any markup but the content does
+     * but the space normalization is turned off.
+      * see createDocumentWithMarkup for document content.
+      */
+     @Test
+     public void markupNoneHeaderInContentNoNormalization() {
+         UpdateRequestProcessor processor = headerContentProcessor(false);
+
+         AddUpdateCommand cmd = new AddUpdateCommand();
+         cmd.solrDoc = createDocumentWithMarkup();
+
+         try {
+             processor.processAdd(cmd);
+
+             String actualHeader = (String) cmd.solrDoc.getFieldValue("header");
+             assertEquals("Header without markup", actualHeader);
+             String actualContent = (String) cmd.solrDoc.getFieldValue("content");
+             assertEquals(" Content   with  markup", actualContent);
+         } catch (IOException e) {
+             fail(e.toString());
+         }
+     }
+
 
 
 }
