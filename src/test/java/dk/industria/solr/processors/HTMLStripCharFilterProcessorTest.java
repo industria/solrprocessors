@@ -26,6 +26,7 @@ public class HTMLStripCharFilterProcessorTest {
     /**
      * Configure a UpdateRequestProcessor to read the fields header and content.
      *
+     * @param normalize Indicate if spaces should be normalized as part of the filter processor.
      * @return UpdateRequestProcessor (HTMLStripCharFilterProcessor)
      */
     private static UpdateRequestProcessor headerContentProcessor(boolean normalize) {
