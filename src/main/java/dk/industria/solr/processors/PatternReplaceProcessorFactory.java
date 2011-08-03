@@ -1,5 +1,8 @@
 package dk.industria.solr.processors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +70,67 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
      */
     private static final Logger logger = LoggerFactory.getLogger(PatternReplaceProcessorFactory.class);
 
+    /**
+     * Get a String element from a NamedList.
+     *
+     * @param args NamedList to get the String from.
+     * @param name String containing the name of the name attribute to retrieve.
+     * @return Value of the name attribute. Null if the value isn't a String or doesn't exists.
+     */
+    private static String getStringElement(final NamedList args, final String name) {
+        Object o = args.get(name);
+        if(o instanceof String) {
+            return (String)o;
+        }
+        return null;
+    }
+
+    /**
+     * Extract pattern replace rules from the processor chain arguments.
+     *
+     * A rule needs to be a NamedList type entry with name attribute set to rule
+     * and containing three String type entries with name attribute set to
+     * id, pattern and replace.
+     *
+     * @param args NamedList as supplied by the processor chain.
+     * @return List of PatternReplaceRule extracted from the processor arguments.
+     */
+    private static List<PatternReplaceRule> extractRules(final NamedList args) {
+        List<PatternReplaceRule> rules = new ArrayList<PatternReplaceRule>();
+
+        List ruleElements = args.getAll("rule");
+        for(Object ruleElement : ruleElements) {
+            if(!(ruleElement instanceof NamedList)) {
+                logger.warn("Element with name attribute set to rule but it is not a <lst> element. Check your configuration.");
+                continue;
+            }
+            try {
+                String id = getStringElement((NamedList)ruleElement, "id");
+                if(null == id) {
+                    logger.warn("id not found for rule");
+                    continue;
+                }
+                String pattern = getStringElement((NamedList)ruleElement, "pattern");
+                if(null == pattern) {
+                    logger.warn("pattern not found for rule");
+                    continue;
+
+                }
+                String replace = getStringElement((NamedList)ruleElement, "replace");
+                if(null == replace) {
+                    logger.warn("replace not found for rule");
+                    continue;
+                }
+                PatternReplaceRule rule = PatternReplaceRule.getInstance(id, pattern, replace);
+                rules.add(rule);
+                logger.info("Added rule: {}", rule.toString());
+            } catch(IllegalArgumentException e) {
+                logger.warn("Unable to create rule for {}, error was {}", ruleElement.toString(), e.getMessage());
+            }
+        }
+        return rules;
+    }
+
 
     /**
       * Init called by Solr processor chain.
@@ -75,6 +139,8 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
       */
      @Override
      public void init(final NamedList args) {
+         List<PatternReplaceRule> rules = extractRules(args);
+
      }
 
     /**

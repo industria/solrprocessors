@@ -15,7 +15,7 @@ import org.apache.solr.update.AddUpdateCommand;
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 
 
-public class PatternReplaceProcessor extends UpdateRequestProcessor {
+class PatternReplaceProcessor extends UpdateRequestProcessor {
     /**
      * Logger
      */
