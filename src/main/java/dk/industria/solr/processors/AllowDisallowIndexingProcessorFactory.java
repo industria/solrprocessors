@@ -30,7 +30,7 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
  * <p>The main purpose of this is to process the init arguments into a list
  * of field match rules and a mode of operation.</p>
  * <p/>
- * <p>Configuration is done by placing a lst element with in the processor element
+ * <p>Configuration is done by placing a lst element within the processor element
  * with a name attribute set to either allow or disallow which indicates the mode
  * of operation. Within that lst element str elements with the name attribute set
  * to the field to match and the value to the matching rule.</p>
