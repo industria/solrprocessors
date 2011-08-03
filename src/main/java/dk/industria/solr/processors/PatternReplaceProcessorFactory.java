@@ -1,6 +1,7 @@
 package dk.industria.solr.processors;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -71,7 +72,15 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
      * Logger
      */
     private static final Logger logger = LoggerFactory.getLogger(PatternReplaceProcessorFactory.class);
-
+    /**
+     * Field to pattern replace rule mapping.
+     */
+    private Map<String, PatternReplaceRule> fieldRules;
+    /**
+     * Collection of field derived from the above mapping.
+     * This so the actual processor doesn't have to derive the collection on every invocation.
+     */
+    private Collection<String> fields;
     /**
      * Get a String element from a NamedList.
      *
@@ -133,6 +142,41 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
         return rules;
     }
 
+    /**
+     * Extract field to pattern replace rule mapping..
+     *
+     * @param args NamedList with arguments as passed by the processor chain.
+     * @return Map with field name to pattern replace rule mapping.
+     */
+    private static Map<String, PatternReplaceRule> extractFieldRuleMappings(final NamedList args) {
+        Map<String, PatternReplaceRule> fieldRules = new HashMap<String, PatternReplaceRule>();
+
+        Map<String, PatternReplaceRule> idRules = extractRules(args);
+
+        Object fieldsElement = args.get("fields");
+        if(fieldsElement instanceof NamedList) {
+            @SuppressWarnings("unchecked")
+            Iterator<Map.Entry<String, ?>> itr = (Iterator<Map.Entry<String, ?>>)((NamedList)fieldsElement).iterator();
+            while (itr.hasNext()) {
+                Map.Entry<String, ?> kv = itr.next();
+                if(kv.getValue() instanceof String) {
+                    String fieldName = kv.getKey();
+                    String ruleId = (String)kv.getValue();
+                    if(idRules.containsKey(ruleId)) {
+                        fieldRules.put(fieldName, idRules.get(ruleId));
+                    } else {
+                        logger.warn("Unknown rule id {}", String.valueOf(ruleId));
+                    }
+                } else {
+                    logger.warn("Element in fields list not a <str> element [{}]", String.valueOf(kv));
+                }
+            }
+        } else {
+            logger.warn("Element with fields name attribute not a <lst> element. Check the configuration.");
+        }
+        return fieldRules;
+    }
+
 
     /**
       * Init called by Solr processor chain.
@@ -141,8 +185,14 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
       */
      @Override
      public void init(final NamedList args) {
-         Map<String, PatternReplaceRule> rules = extractRules(args);
-
+         this.fieldRules = extractFieldRuleMappings(args);
+         this.fields = this.fieldRules.keySet();
+         if(logger.isInfoEnabled()) {
+             for(String field : this.fields) {
+                 PatternReplaceRule rule = fieldRules.get(field);
+                 logger.info("Field [{}] configured with rule {}", field, String.valueOf(rule));
+             }
+         }
      }
 
     /**
@@ -151,7 +201,7 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
      * @param req  SolrQueryRequest
      * @param rsp  SolrQueryResponse
      * @param next UpdateRequestProcessor
-     * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
+     * @return Instance of PatternReplaceProcessor configured with field list and rule mapping.
      */
     @Override
     public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
