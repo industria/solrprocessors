@@ -129,7 +129,7 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
 
     /**
      * Init called by Solr processor chain
-     * The values configured for keys field is extracted to fieldsToProcess.
+     * The values configured for name attribute field are extracted to fieldsToProcess.
      *
      * @param args NamedList of parameters set in the processor definition in solrconfig.xml
      */
