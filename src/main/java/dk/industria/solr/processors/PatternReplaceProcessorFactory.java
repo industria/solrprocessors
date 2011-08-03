@@ -2,6 +2,8 @@ package dk.industria.solr.processors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,10 +95,10 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
      * id, pattern and replace.
      *
      * @param args NamedList as supplied by the processor chain.
-     * @return List of PatternReplaceRule extracted from the processor arguments.
+     * @return Map of PatternReplaceRule extracted from the processor arguments keyed by id..
      */
-    private static List<PatternReplaceRule> extractRules(final NamedList args) {
-        List<PatternReplaceRule> rules = new ArrayList<PatternReplaceRule>();
+    private static Map<String, PatternReplaceRule> extractRules(final NamedList args) {
+        Map<String, PatternReplaceRule> rules = new HashMap<String, PatternReplaceRule>();
 
         List ruleElements = args.getAll("rule");
         for(Object ruleElement : ruleElements) {
@@ -122,7 +124,7 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
                     continue;
                 }
                 PatternReplaceRule rule = PatternReplaceRule.getInstance(id, pattern, replace);
-                rules.add(rule);
+                rules.put(id, rule);
                 logger.info("Added rule: {}", rule.toString());
             } catch(IllegalArgumentException e) {
                 logger.warn("Unable to create rule for {}, error was {}", ruleElement.toString(), e.getMessage());
@@ -139,7 +141,7 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
       */
      @Override
      public void init(final NamedList args) {
-         List<PatternReplaceRule> rules = extractRules(args);
+         Map<String, PatternReplaceRule> rules = extractRules(args);
 
      }
 
