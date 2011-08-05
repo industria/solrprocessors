@@ -1,6 +1,7 @@
 package dk.industria.solr.processors;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -52,6 +53,34 @@ class PatternReplaceProcessor extends UpdateRequestProcessor {
      */
     @Override
     public void processAdd(AddUpdateCommand cmd) throws IOException {
+        SolrInputDocument document = cmd.getSolrInputDocument();
+
+        for(String fieldName : this.fields) {
+            logger.debug("Processing field: {}", fieldName);
+
+            SolrInputField field = document.getField(fieldName);
+            if (null == field) continue;
+
+            Collection<Object> values = field.getValues();
+            if (null == values) continue;
+
+            PatternReplaceRule rule = this.rules.get(fieldName);
+            Collection<Object> newValues = new ArrayList<Object>();
+            for (Object value : values) {
+                if (value instanceof String) {
+                    // TODO: run the replacement
+                    String newValue = (String)value;
+
+                    newValues.add(newValue);
+                } else {
+                    newValues.add(value);
+                }
+            }
+            float boost = field.getBoost();
+            field.setValue(newValues, boost);
+
+        }
+
         super.processAdd(cmd);
     }
 
