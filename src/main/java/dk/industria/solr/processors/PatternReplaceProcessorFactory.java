@@ -1,10 +1,6 @@
 package dk.industria.solr.processors;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,6 +175,30 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
 
 
     /**
+     *  Get collection of field names with a pattern replace rule attached.
+     *
+     * @return unmodifiable collection of field names with a pattern rule.
+     */
+    public Collection<String> getFields() {
+        if(null == this.fields) {
+            return Collections.unmodifiableCollection(new ArrayList<String>());
+        }
+        return Collections.unmodifiableCollection(this.fields);
+    }
+
+    /**
+     * Get a map containing field to pattern replace rule mappings.
+     *
+     * @return Unmodifiable map containing mapping between fields and pattern replace rules.
+     */
+    public Map<String, PatternReplaceRule> getRules() {
+        if(null == this.fieldRules) {
+            return Collections.unmodifiableMap(new HashMap<String, PatternReplaceRule>());
+        }
+        return Collections.unmodifiableMap(this.fieldRules);
+    }
+
+    /**
       * Init called by Solr processor chain.
       *
       * @param args NamedList of parameters set in the processor definition in solrconfig.xml
@@ -205,7 +225,7 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
      */
     @Override
     public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-        return new PatternReplaceProcessor(next);
+        return new PatternReplaceProcessor(this.getFields(), this.getRules(), next);
     }
 
 }

@@ -4,6 +4,12 @@ package dk.industria.solr.processors;
 import org.apache.solr.common.util.NamedList;
 
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 /**
@@ -56,13 +62,54 @@ public class PatternReplaceProcessorFactoryTest {
         return args;
     }
 
+    @Test
+    public void notInitializedReturnsField() {
+        PatternReplaceProcessorFactory factory = new PatternReplaceProcessorFactory();
+        Collection<String> fields = factory.getFields();
+        assertNotNull(fields);
+        assertEquals(0, fields.size());
+    }
+
+    @Test
+    public void notInitializedReturnsFieldRules() {
+        PatternReplaceProcessorFactory factory = new PatternReplaceProcessorFactory();
+        Map<String, PatternReplaceRule> rules = factory.getRules();
+        assertNotNull(rules);
+        assertTrue(rules.isEmpty());
+    }
 
     @Test
     public void configTest() {
         PatternReplaceProcessorFactory factory = new PatternReplaceProcessorFactory();
         factory.init(createLegalConfig());
 
-        assertTrue(true);
+        List<String> expectedFields = new ArrayList<String>();
+        expectedFields.add("title");
+        expectedFields.add("name");
+        expectedFields.add("comment");
+        expectedFields.add("card");
+
+        Collection<String> fields = factory.getFields();
+        assertEquals(expectedFields.size(), fields.size());
+        assertTrue(fields.containsAll(expectedFields));
+
+        Map<String, PatternReplaceRule> rules = factory.getRules();
+
+        PatternReplaceRule ruleTitle = rules.get("title");
+        assertNotNull(ruleTitle);
+        assertEquals("punctuation", ruleTitle.getId());
+
+        PatternReplaceRule ruleName = rules.get("name");
+        assertNotNull(ruleName);
+        assertEquals("punctuation", ruleName.getId());
+
+        PatternReplaceRule ruleComment = rules.get("comment");
+        assertNotNull(ruleComment);
+        assertEquals("punctuation", ruleComment.getId());
+
+        PatternReplaceRule ruleCard = rules.get("card");
+        assertNotNull(ruleCard);
+        assertEquals("prefix", ruleCard.getId());
     }
 
 }

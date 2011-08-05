@@ -34,6 +34,33 @@ class PatternReplaceRule {
     }
 
     /**
+     * Get id of the rule.
+     *
+     * @return String containing the id of the rule.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Get rule pattern as a compiled regular expression..
+     *
+     * @return Pattern representation of the rule.
+     */
+    public Pattern getPattern() {
+        return pattern;
+    }
+
+    /**
+     * Get the replacement value.
+     *
+     * @return String to replace the pattern with.
+     */
+    public String getReplacement() {
+        return replacement;
+    }
+
+    /**
      * Create a new PatternReplaceRule.
      *
      * @param id Id used to identify the rule in field mappings.
