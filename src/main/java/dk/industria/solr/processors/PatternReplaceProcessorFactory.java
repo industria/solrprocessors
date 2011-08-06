@@ -68,14 +68,9 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
      */
     private static final Logger logger = LoggerFactory.getLogger(PatternReplaceProcessorFactory.class);
     /**
-     * Field to pattern replace rule mapping.
+     * Field pattern rules configured.
      */
-    private Map<String, PatternReplaceRule> fieldRules;
-    /**
-     * Collection of field derived from the above mapping.
-     * This so the actual processor doesn't have to derive the collection on every invocation.
-     */
-    private Collection<String> fields;
+    private Collection<FieldPatternReplaceRules> fieldPatternRules;
     /**
      * Get a String element from a NamedList.
      *
@@ -138,15 +133,15 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
     }
 
     /**
-     * Extract field to pattern replace rule mapping..
+     * Extract field pattern replace rules..
      *
      * @param args NamedList with arguments as passed by the processor chain.
-     * @return Map with field name to pattern replace rule mapping.
+     * @return Collection of field pattern replace rules.
      */
-    private static Map<String, PatternReplaceRule> extractFieldRuleMappings(final NamedList args) {
-        Map<String, PatternReplaceRule> fieldRules = new HashMap<String, PatternReplaceRule>();
-
+    private static Collection<FieldPatternReplaceRules> extractFieldRuleMappings(final NamedList args) {
         Map<String, PatternReplaceRule> idRules = extractRules(args);
+
+        Map<String, FieldPatternReplaceRules> fieldPatternRules = new HashMap<String, FieldPatternReplaceRules>();
 
         Object fieldsElement = args.get("fields");
         if(fieldsElement instanceof NamedList) {
@@ -157,8 +152,20 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
                 if(kv.getValue() instanceof String) {
                     String fieldName = kv.getKey();
                     String ruleId = (String)kv.getValue();
+
+                    // TODO: might need to check fieldName for null
+
+                    // Make sure there is a FieldPatternReplaceRiles attached to the
+                    // field in the fieldPatternRules
+                    FieldPatternReplaceRules fr = fieldPatternRules.get(fieldName);
+                    if(null == fr) {
+                        fr = new FieldPatternReplaceRules(fieldName);
+                        fieldPatternRules.put(fieldName, fr);
+                    }
+
+
                     if(idRules.containsKey(ruleId)) {
-                        fieldRules.put(fieldName, idRules.get(ruleId));
+                        fr.add(idRules.get(ruleId));
                     } else {
                         logger.warn("Unknown rule id {}", String.valueOf(ruleId));
                     }
@@ -169,32 +176,19 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
         } else {
             logger.warn("Element with fields name attribute not a <lst> element. Check the configuration.");
         }
-        return fieldRules;
-    }
-
-
-    /**
-     *  Get collection of field names with a pattern replace rule attached.
-     *
-     * @return unmodifiable collection of field names with a pattern rule.
-     */
-    public Collection<String> getFields() {
-        if(null == this.fields) {
-            return Collections.unmodifiableCollection(new ArrayList<String>());
-        }
-        return Collections.unmodifiableCollection(this.fields);
+        return fieldPatternRules.values();
     }
 
     /**
-     * Get a map containing field to pattern replace rule mappings.
+     * Get collection of field pattern replace rules.
      *
-     * @return Unmodifiable map containing mapping between fields and pattern replace rules.
+     * @return Unmodifiable collection of pattern replace rules.
      */
-    public Map<String, PatternReplaceRule> getRules() {
-        if(null == this.fieldRules) {
-            return Collections.unmodifiableMap(new HashMap<String, PatternReplaceRule>());
+    public Collection<FieldPatternReplaceRules> getFieldRules() {
+        if(null == this.fieldPatternRules) {
+            return Collections.unmodifiableCollection(new ArrayList<FieldPatternReplaceRules>());
         }
-        return Collections.unmodifiableMap(this.fieldRules);
+        return Collections.unmodifiableCollection(this.fieldPatternRules);
     }
 
     /**
@@ -204,12 +198,10 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
       */
      @Override
      public void init(final NamedList args) {
-         this.fieldRules = extractFieldRuleMappings(args);
-         this.fields = this.fieldRules.keySet();
+         this.fieldPatternRules = extractFieldRuleMappings(args);
          if(logger.isInfoEnabled()) {
-             for(String field : this.fields) {
-                 PatternReplaceRule rule = fieldRules.get(field);
-                 logger.info("Field [{}] configured with rule {}", field, String.valueOf(rule));
+             for(FieldPatternReplaceRules fieldRules : this.fieldPatternRules) {
+                 logger.info("Field [{}] configured with rule {}", fieldRules.getFieldName(), String.valueOf(fieldRules));
              }
          }
      }
@@ -224,7 +216,7 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
      */
     @Override
     public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-        return new PatternReplaceProcessor(this.getFields(), this.getRules(), next);
+        return new PatternReplaceProcessor(this.fieldPatternRules,next);
     }
 
 }

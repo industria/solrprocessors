@@ -3,11 +3,13 @@ package dk.industria.solr.processors;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +28,19 @@ class PatternReplaceProcessor extends UpdateRequestProcessor {
      */
     private static final Logger logger = LoggerFactory.getLogger(PatternReplaceProcessor.class);
     /**
-     * Collection of field names to process.
+     * Collection of field pattern replace rules to process.
      */
-    private final Collection<String> fields;
-    /**
-     * Mapping from field name to pattern replace rule.
-     */
-    private final Map<String, PatternReplaceRule> rules;
+    private final Collection<FieldPatternReplaceRules> fieldPatternRules;
 
     /**
      * Construct a PatternReplaceProcessor.
      *
-     * @param fields Collection of field names to process.
-     * @param rules Mapping of field names to pattern replace rules..
+     * @param fieldPatternRules Collection of field pattern rules to process.
      * @param next Next UpdateRequestProcessor in the processor chain.
      */
-    public PatternReplaceProcessor(final Collection<String> fields, final Map<String,PatternReplaceRule> rules, UpdateRequestProcessor next) {
+    public PatternReplaceProcessor(final Collection<FieldPatternReplaceRules> fieldPatternRules, UpdateRequestProcessor next) {
         super(next);
-        this.fields = fields;
-        this.rules = rules;
+        this.fieldPatternRules = fieldPatternRules;
     }
 
     /**
@@ -57,7 +53,8 @@ class PatternReplaceProcessor extends UpdateRequestProcessor {
     public void processAdd(AddUpdateCommand cmd) throws IOException {
         SolrInputDocument document = cmd.getSolrInputDocument();
 
-        for(String fieldName : this.fields) {
+        for(FieldPatternReplaceRules fieldRules : this.fieldPatternRules) {
+            String fieldName = fieldRules.getFieldName();
             logger.debug("Processing field: {}", fieldName);
 
             SolrInputField field = document.getField(fieldName);
@@ -66,13 +63,17 @@ class PatternReplaceProcessor extends UpdateRequestProcessor {
             Collection<Object> values = field.getValues();
             if (null == values) continue;
 
-            PatternReplaceRule rule = this.rules.get(fieldName);
+            List<PatternReplaceRule> replaceRules = fieldRules.getRules();
             Collection<Object> newValues = new ArrayList<Object>();
             for (Object value : values) {
                 if (value instanceof String) {
-                    Pattern pattern = rule.getPattern();
-                    Matcher matcher = pattern.matcher((String)value);
-                    String newValue = matcher.replaceAll(rule.getReplacement());
+                    String newValue = (String)value;
+                    for(PatternReplaceRule replaceRule : replaceRules) {
+                        logger.debug("Processing field [{}] with rule: {}", fieldName, replaceRule.toString());
+                        Pattern pattern = replaceRule.getPattern();
+                        Matcher matcher = pattern.matcher(newValue);
+                        newValue = matcher.replaceAll(replaceRule.getReplacement());
+                    }
                     newValues.add(newValue);
                 } else {
                     newValues.add(value);

@@ -33,6 +33,8 @@ public class PatternReplaceProcessorTest {
      * <str name="name">punctuation</str>
      * <str name="comment">punctuation</str>
      * <str name="card">prefix</str>
+     * <str name="clean">punctuation</str>
+     * <str name="clean">prefix</str>
      * </lst>
      *
      * @return NamedList containing the above configuration.
@@ -53,6 +55,8 @@ public class PatternReplaceProcessorTest {
         fields.add("name", "punctuation");
         fields.add("comment", "punctuation");
         fields.add("card", "prefix");
+        fields.add("clean", "punctuation");
+        fields.add("clean", "prefix");
 
         NamedList<NamedList<String>> args = new NamedList<NamedList<String>>();
         args.add("rule", punctuation);
@@ -62,12 +66,8 @@ public class PatternReplaceProcessorTest {
     }
 
     /**
-     * Create a SolrInputDocument containing two fields header, content and card
-     * Field header : Text nothing special
-     * Field content : Text nothing special
-     * Field comment: Text with punctuation.
-     * Field card : xxxx-xxxx-xxxx-xxxx formatted where x are numeric.
-     *
+     * Create a SolrInputDocument.
+
      * @return SolrInputDocument with fields header and content.
      */
     private static SolrInputDocument createDocumentWithCardField() {
@@ -77,6 +77,7 @@ public class PatternReplaceProcessorTest {
         document.addField("content", "Content with markup", 1f);
         document.addField("card", "3333-1111-2222-3333", 1f);
         document.addField("comment", "There, is. punctuation!!", 1f);
+        document.addField("clean", "3333-1111-2222-3333", 1f);
 
         return document;
     }
@@ -101,6 +102,8 @@ public class PatternReplaceProcessorTest {
             assertEquals(expectedCard, cmd.solrDoc.getFieldValue("card"));
             String expectedComment = "There is punctuation";
             assertEquals(expectedComment, cmd.solrDoc.getFieldValue("comment"));
+            String expectedClean = "****111122223333";
+            assertEquals(expectedClean, cmd.solrDoc.getFieldValue("clean"));
         } catch (IOException e) {
             fail(e.toString());
         }

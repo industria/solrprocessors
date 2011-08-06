@@ -142,6 +142,10 @@ will be replaced.
 The processor will replace all values in a field if it is a multivalued field
 and if the values are strings.
 
+It is possible to attach multiple rules to a field by repeating the field in the
+fields list. Each rule attached will be run in order of appearance. In the example
+configuration later, the field card2 has both punctuation and prefix attached.
+
 An example configuration of the PatternReplaceProcessor is shown below. The
 configuration contains two rules, punctuation and prefix. The rule punctuation
 is defined for the fields title, name and comment. The prefix rule is
@@ -164,6 +168,8 @@ defined for the card field.
       <str name="name">punctuation</str>
       <str name="comment">punctuation</str>
       <str name="card">prefix</str>
+      <str name="card2">punctuation</str>
+      <str name="card2">prefix</str>
     </lst>
   </processor>
   <processor class="solr.LogUpdateProcessorFactory" />
