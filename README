@@ -47,7 +47,7 @@ The project contains the following processors:
 
 - AllowDisallowIndexingProcessor
 - HTMLStripCharFilterProcessor
-
+- PatternReplaceProcessor
 
 ==============================
 AllowDisallowIndexingProcessor
@@ -120,6 +120,51 @@ An Example configuration of the HTMLStripCharFilterProcessor:
     <str name="field">header</str>
     <str name="field">content</str>
     <bool name="normalize">true</bool>
+  </processor>
+  <processor class="solr.LogUpdateProcessorFactory" />
+  <processor class="solr.RunUpdateProcessorFactory" />
+</updateRequestProcessorChain>
+
+<requestHandler name="/update" class="solr.XmlUpdateRequestHandler">
+  <lst name="defaults">
+    <str name="update.processor">customChain</str>
+  </lst>
+</requestHandler>
+
+=======================
+PatternReplaceProcessor
+=======================
+The PatternReplaceProcessor makes it possible to replace patterns defined by
+regular expressions with a replacement string. The replacements are done withe
+the matcher objects replaceAll method meaning all matches in a field value
+will be replaced.
+
+The processor will replace all values in a field if it is a multivalued field
+and if the values are strings.
+
+An example configuration of the PatternReplaceProcessor is shown below. The
+configuration contains two rules, punctuation and prefix. The rule punctuation
+is defined for the fields title, name and comment. The prefix rule is
+defined for the card field.
+
+<updateRequestProcessorChain name="customChain">
+  <processor class="dk.industria.solr.processors.PatternReplaceProcessorFactory">
+    <lst name="rule">
+      <str name="id">punctuation</str>
+      <str name="pattern">\p{P}</str>
+      <str name="replace"/>
+    </lst>
+    <lst name="rule">
+      <str name="id">prefix</str>
+      <str name="pattern">^\d{4}</str>
+      <str name="replace">****</str>
+    </lst>
+    <lst name="fields">
+      <str name="title">punctuation</str>
+      <str name="name">punctuation</str>
+      <str name="comment">punctuation</str>
+      <str name="card">prefix</str>
+    </lst>
   </processor>
   <processor class="solr.LogUpdateProcessorFactory" />
   <processor class="solr.RunUpdateProcessorFactory" />

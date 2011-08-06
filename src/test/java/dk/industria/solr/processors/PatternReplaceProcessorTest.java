@@ -66,7 +66,7 @@ public class PatternReplaceProcessorTest {
      * Field header : Text nothing special
      * Field content : Text nothing special
      * Field comment: Text with punctuation.
-     * Field card : xxxx-xxxx-xxxx-xxxx formatted where x are numerics
+     * Field card : xxxx-xxxx-xxxx-xxxx formatted where x are numeric.
      *
      * @return SolrInputDocument with fields header and content.
      */
