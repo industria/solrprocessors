@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 import org.slf4j.Logger;
@@ -68,9 +70,9 @@ class PatternReplaceProcessor extends UpdateRequestProcessor {
             Collection<Object> newValues = new ArrayList<Object>();
             for (Object value : values) {
                 if (value instanceof String) {
-                    // TODO: run the replacement
-                    String newValue = (String)value;
-
+                    Pattern pattern = rule.getPattern();
+                    Matcher matcher = pattern.matcher((String)value);
+                    String newValue = matcher.replaceAll(rule.getReplacement());
                     newValues.add(newValue);
                 } else {
                     newValues.add(value);
