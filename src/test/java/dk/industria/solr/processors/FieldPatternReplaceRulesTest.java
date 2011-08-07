@@ -66,6 +66,6 @@ public class FieldPatternReplaceRulesTest {
     @Test(expected = IllegalArgumentException.class)
     public void replaceNull() {
         FieldPatternReplaceRules rules = createRules();
-        String actual = rules.replace(null);
+        rules.replace(null);
     }
 }

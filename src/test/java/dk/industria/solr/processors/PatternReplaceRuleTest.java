@@ -84,6 +84,6 @@ public class PatternReplaceRuleTest {
     @Test(expected = IllegalArgumentException.class)
     public void replaceNullArgTest() {
         PatternReplaceRule r = PatternReplaceRule.getInstance("id", "\\d{6}$", "xxxx");
-        String actual = r.replace(null);
+        r.replace(null);
     }
 }
