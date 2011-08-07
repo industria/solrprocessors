@@ -67,13 +67,7 @@ class PatternReplaceProcessor extends UpdateRequestProcessor {
             Collection<Object> newValues = new ArrayList<Object>();
             for (Object value : values) {
                 if (value instanceof String) {
-                    String newValue = (String)value;
-                    for(PatternReplaceRule replaceRule : replaceRules) {
-                        logger.debug("Processing field [{}] with rule: {}", fieldName, replaceRule.toString());
-                        Pattern pattern = replaceRule.getPattern();
-                        Matcher matcher = pattern.matcher(newValue);
-                        newValue = matcher.replaceAll(replaceRule.getReplacement());
-                    }
+                    String newValue = fieldRules.replace((String)value);
                     newValues.add(newValue);
                 } else {
                     newValues.add(value);

@@ -85,6 +85,19 @@ class PatternReplaceRule {
     }
 
     /**
+     * Apply the pattern replace rule to a value.
+     * @param value Value to apply the pattern replace rule to.
+     * @return Value after the rule has been applied to the value.
+     */
+    public String replace(String value) {
+        if(null == value) throw new IllegalArgumentException("value is null");
+
+        Matcher matcher = pattern.matcher(value);
+        return matcher.replaceAll(replacement);
+    }
+
+
+    /**
      * Get a String representation of the pattern replace rule.
      *
      * @return String representation of the pattern replace rule.

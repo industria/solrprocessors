@@ -4,6 +4,8 @@ package dk.industria.solr.processors;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Implements a field with a list of pattern replace rules attached..
@@ -61,5 +63,21 @@ class FieldPatternReplaceRules {
         this.rules.add(rule);
     }
 
+    /**
+     * Replace patterns in the value according to the rules.
+     *
+     * @param value Value to apply the pattern replace rules to.
+     * @return New value after pattern replace rules have been applied.
+     * @throws IllegalArgumentException if called with a null value.
+     */
+    public String replace(String value) {
+        if(null == value) throw new IllegalArgumentException("null value");
+
+        String newValue = value;
+        for(PatternReplaceRule rule : this.rules) {
+            newValue = rule.replace(newValue);
+        }
+        return newValue;
+    }
 
 }

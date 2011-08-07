@@ -57,4 +57,33 @@ public class PatternReplaceRuleTest {
         PatternReplaceRule r = PatternReplaceRule.getInstance("id", "(\\d+)", "?");
         assertEquals("Id: [id] Pattern: [(\\d+)] Replace: [?]", r.toString());
     }
+
+    /**
+     * Testing replace with a match
+     */
+    @Test
+    public void replaceTest() {
+        PatternReplaceRule r = PatternReplaceRule.getInstance("id", "\\d{4}$", "xxxx");
+        String actual = r.replace("1111-2222-3333-4444");
+        assertEquals("1111-2222-3333-xxxx", actual);
+    }
+
+    /**
+     * Testing replace with a non matching pattern
+     */
+    @Test
+    public void replaceNoMatchTest() {
+        PatternReplaceRule r = PatternReplaceRule.getInstance("id", "\\d{6}$", "xxxx");
+        String actual = r.replace("1111-2222-3333-4444");
+        assertEquals("1111-2222-3333-4444", actual);
+    }
+
+    /**
+     * Testing replace with a null value
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void replaceNullArgTest() {
+        PatternReplaceRule r = PatternReplaceRule.getInstance("id", "\\d{6}$", "xxxx");
+        String actual = r.replace(null);
+    }
 }
