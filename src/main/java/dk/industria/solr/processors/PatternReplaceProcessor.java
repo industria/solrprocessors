@@ -63,7 +63,6 @@ class PatternReplaceProcessor extends UpdateRequestProcessor {
             Collection<Object> values = field.getValues();
             if (null == values) continue;
 
-            List<PatternReplaceRule> replaceRules = fieldRules.getRules();
             Collection<Object> newValues = new ArrayList<Object>();
             for (Object value : values) {
                 if (value instanceof String) {
