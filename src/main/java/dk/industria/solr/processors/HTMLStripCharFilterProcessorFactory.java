@@ -158,6 +158,6 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
      */
     @Override
     public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-        return new HTMLStripCharFilterProcessor(fieldsToProcess, spaceNormalize, next);
+        return new HTMLStripCharFilterProcessor(this.getFields(), this.getNormalize(), next);
     }
 }
