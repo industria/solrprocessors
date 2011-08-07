@@ -8,6 +8,13 @@
     <name>solrprocessors</name>
     <description>Solr processors for use in the update request processor chain.</description>
     <inceptionYear>2011</inceptionYear>
+    <licenses>
+      <license>
+        <name>Apache 2</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>manual</distribution>
+      </license>
+    </licenses>
     <url>https://github.com/industria/solrprocessors/</url>
     <scm>
       <connection>scm:git://github.com/industria/solrprocessors.git</connection>
