@@ -4,7 +4,7 @@
     <groupId>dk.industria.solr.processors</groupId>
     <artifactId>solrprocessors</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>solrprocessors</name>
     <description>Solr processors for use in the update request processor chain.</description>
     <inceptionYear>2011</inceptionYear>
