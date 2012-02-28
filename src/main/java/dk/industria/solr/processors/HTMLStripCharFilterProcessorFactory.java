@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.solr.common.util.NamedList;
 
 import org.apache.solr.request.SolrQueryRequest;
-import org.apache.solr.request.SolrQueryResponse;
+import org.apache.solr.response.SolrQueryResponse;
 
 
 import org.apache.solr.update.processor.UpdateRequestProcessor;
@@ -166,13 +166,13 @@ public class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorF
     /**
      * Factory method for the HTMLStripCharFilterProcessor called by SOLR processor chain.
      *
-     * @param req  SolrQueryRequest
-     * @param rsp  SolrQueryResponse
-     * @param next UpdateRequestProcessor
+     * @param solrQueryRequest SolrQueryRequest
+     * @param solrQueryResponse SolrQueryResponse
+     * @param updateRequestProcessor UpdateRequestProcessor
      * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
      */
     @Override
-    public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-        return new HTMLStripCharFilterProcessor(this.getFields(), this.getNormalize(), next);
+    public UpdateRequestProcessor getInstance(SolrQueryRequest solrQueryRequest, org.apache.solr.response.SolrQueryResponse solrQueryResponse, UpdateRequestProcessor updateRequestProcessor) {
+        return new HTMLStripCharFilterProcessor(this.getFields(), this.getNormalize(), updateRequestProcessor);
     }
 }

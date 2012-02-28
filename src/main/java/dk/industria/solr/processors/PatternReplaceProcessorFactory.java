@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.solr.common.util.NamedList;
 
 import org.apache.solr.request.SolrQueryRequest;
-import org.apache.solr.request.SolrQueryResponse;
+import org.apache.solr.response.SolrQueryResponse;
 
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
@@ -224,14 +224,13 @@ public class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactor
     /**
      * Factory method for the PatternReplaceProcessor called by Solr processor chain.
      *
-     * @param req  SolrQueryRequest
-     * @param rsp  SolrQueryResponse
-     * @param next UpdateRequestProcessor
+     * @param solrQueryRequest SolrQueryRequest
+     * @param solrQueryResponse SolrQueryResponse
+     * @param updateRequestProcessor UpdateRequestProcessor
      * @return Instance of PatternReplaceProcessor configured with field list and rule mapping.
      */
     @Override
-    public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-        return new PatternReplaceProcessor(this.fieldPatternRules,next);
+    public UpdateRequestProcessor getInstance(SolrQueryRequest solrQueryRequest, org.apache.solr.response.SolrQueryResponse solrQueryResponse, UpdateRequestProcessor updateRequestProcessor) {
+        return new PatternReplaceProcessor(this.fieldPatternRules, updateRequestProcessor);
     }
-
 }

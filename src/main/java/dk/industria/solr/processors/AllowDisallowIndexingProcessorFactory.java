@@ -32,8 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.solr.common.util.NamedList;
 
 import org.apache.solr.request.SolrQueryRequest;
-import org.apache.solr.request.SolrQueryResponse;
-
+import org.apache.solr.response.SolrQueryResponse;
 
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
@@ -205,15 +204,15 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
     /**
      * Factory method for the AllowDisallowIndexingProcessor called by Solr processor chain.
      *
-     * @param req  SolrQueryRequest
-     * @param rsp  SolrQueryResponse
-     * @param next UpdateRequestProcessor
+     * @param solrQueryRequest SolrQueryRequest
+     * @param solrQueryResponse SolrQueryResponse
+     * @param updateRequestProcessor UpdateRequestProcessor
      * @return Instance of AllowDisallowIndexingProcessor initialized with the fields to process.
      */
     @Override
-    public UpdateRequestProcessor getInstance(SolrQueryRequest req, SolrQueryResponse rsp, UpdateRequestProcessor next) {
-        String uniqueFieldName = uniqueKey(req);
-        return new AllowDisallowIndexingProcessor(this.mode, this.rules, uniqueFieldName, next);
+    public UpdateRequestProcessor getInstance(SolrQueryRequest solrQueryRequest, SolrQueryResponse solrQueryResponse, UpdateRequestProcessor updateRequestProcessor) {
+        String uniqueFieldName = uniqueKey(solrQueryRequest);
+        return new AllowDisallowIndexingProcessor(this.mode, this.rules, uniqueFieldName, updateRequestProcessor);
     }
 
 }
