@@ -126,7 +126,7 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
             }
 
             try {
-                FieldMatchRule rule = FieldMatchRule.getInstance(key, value);
+                FieldMatchRule rule = new FieldMatchRule(key, value);
                 rules.add(rule);
                 logger.debug("Added FieldMatchRule : {}", rule.toString());
             } catch (IllegalArgumentException e) {

@@ -33,7 +33,7 @@ public class FieldMatchRuleTest {
     public void getInstanceLegalTest() {
         String field = "content_type";
         String pattern = "default";
-        FieldMatchRule rule = FieldMatchRule.getInstance(field, pattern);
+        FieldMatchRule rule = new FieldMatchRule(field, pattern);
         assertNotNull(rule);
     }
 
@@ -44,7 +44,7 @@ public class FieldMatchRuleTest {
     public void getInstanceIllegalNullFieldTest() {
         String field = null;
         String pattern = "default";
-        FieldMatchRule.getInstance(field, pattern);
+        new FieldMatchRule(field, pattern);
     }
 
     /**
@@ -54,7 +54,7 @@ public class FieldMatchRuleTest {
     public void getInstanceIllegalNullPatternTest() {
         String field = "content_type";
         String pattern = null;
-        FieldMatchRule.getInstance(field, pattern);
+        new FieldMatchRule(field, pattern);
     }
 
     /**
@@ -64,7 +64,7 @@ public class FieldMatchRuleTest {
     public void getInstanceIllegalPatternTest() {
         String field = "content_type";
         String pattern = "(fi+";
-        FieldMatchRule.getInstance(field, pattern);
+        new FieldMatchRule(field, pattern);
     }
 
 
@@ -72,19 +72,19 @@ public class FieldMatchRuleTest {
     public void getFieldPassThrough() {
         String fieldName = "content_type";
         String pattern = "all_*";
-        FieldMatchRule rule = FieldMatchRule.getInstance(fieldName, pattern);
+        FieldMatchRule rule = new FieldMatchRule(fieldName, pattern);
         assertEquals(fieldName, rule.getField());
     }
 
 
     @Test
     public void matchValue() {
-        FieldMatchRule rule = FieldMatchRule.getInstance("content_type", "^\\d{2}$");
-        assertFalse(rule.match(null));
-        assertFalse(rule.match(""));
-        assertFalse(rule.match("a1b2"));
-        assertFalse(rule.match("a42x"));
-        assertTrue(rule.match("42"));
+        FieldMatchRule rule = new FieldMatchRule("content_type", "^\\d{2}$");
+        assertFalse(rule.matches(null));
+        assertFalse(rule.matches(""));
+        assertFalse(rule.matches("a1b2"));
+        assertFalse(rule.matches("a42x"));
+        assertTrue(rule.matches("42"));
     }
 
     /**
@@ -92,7 +92,7 @@ public class FieldMatchRuleTest {
      */
     @Test
     public void toStringTest() {
-        FieldMatchRule fmr = FieldMatchRule.getInstance("field", "matchPattern");
+        FieldMatchRule fmr = new FieldMatchRule("field", "matchPattern");
         assertEquals("field =~ m/matchPattern/", fmr.toString());
     }
 }

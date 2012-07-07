@@ -85,7 +85,7 @@ class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
             for (Object objectValue : fieldValues) {
                 if (objectValue instanceof String) {
                     String value = (String) objectValue;
-                    if (rule.match(value)) {
+                    if (rule.matches(value)) {
                         logger.debug("Matched rule [{}] on value [{}]", String.valueOf(rule), value);
                         return true;
                     }
