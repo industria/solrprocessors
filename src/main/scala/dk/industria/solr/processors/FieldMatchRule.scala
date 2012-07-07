@@ -15,26 +15,46 @@
  */
 package dk.industria.solr.processors
 
+/**
+ * Represents a rule for matching field values
+ * <p>Used by the @see AllowDisallowIndexingProcessor.</p>.
+ */
 class FieldMatchRule(field: String, pattern: String) {
   require(null != field)
   require(null != pattern)
   
-  private val regexPattern = pattern.r
+  /**
+   * Pattern to match against the field.
+   */
+  private val _pattern = pattern.r
 
-  def getField(): String = field
+  /**
+   * Get the field name of the match rule.
+   * @return Field name of the match field.
+   */ 
+  def field(): String = field
 
+  /**
+   * Matches the field value against the pattern.
+   * @param fieldValue Value to test the pattern against.
+   * @return True if the pattern matches the field value.
+   */ 
   def matches(fieldValue: String): Boolean = {
     if(null == fieldValue) return false;
 
-    val m = regexPattern.findFirstMatchIn(fieldValue)
-    return m.isDefined
+    val m = _pattern.findFirstMatchIn(fieldValue)
+    m.isDefined
   }
 
+  /**
+   * Returns a String representation of the field match rule.
+   * @return String representing the rule.
+   */
   override def toString = {
     val s = new StringBuilder(128)
     s.append(field)
     s.append(" =~ m/")
-    s.append(regexPattern)
+    s.append(_pattern)
     s.append("/")
     s.toString()
   }

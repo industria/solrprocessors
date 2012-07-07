@@ -73,7 +73,7 @@ public class FieldMatchRuleTest {
         String fieldName = "content_type";
         String pattern = "all_*";
         FieldMatchRule rule = new FieldMatchRule(fieldName, pattern);
-        assertEquals(fieldName, rule.getField());
+        assertEquals(fieldName, rule.field());
     }
 
 

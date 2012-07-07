@@ -80,7 +80,7 @@ class AllowDisallowIndexingProcessor extends UpdateRequestProcessor {
         for (FieldMatchRule rule : rules) {
             logger.debug("Testing rule: {}", String.valueOf(rule));
 
-            String ruleField = rule.getField();
+            String ruleField = rule.field();
             Collection<Object> fieldValues = document.getFieldValues(ruleField);
             for (Object objectValue : fieldValues) {
                 if (objectValue instanceof String) {
