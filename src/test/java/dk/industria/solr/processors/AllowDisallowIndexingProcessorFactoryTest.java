@@ -15,7 +15,6 @@
  */
 package dk.industria.solr.processors;
 
-
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -125,7 +124,7 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     @Test
     public void modeAndRulesNotConfigured() {
         AllowDisallowIndexingProcessorFactory factory = new AllowDisallowIndexingProcessorFactory();
-        assertEquals(AllowDisallowMode.UNKNOWN, factory.getMode());
+        assertEquals(AllowDisallowMode.Unknown(), factory.getMode());
         List<FieldMatchRule> rules = factory.getRules();
         assertNotNull(rules);
         assertEquals(0, rules.size());
@@ -137,7 +136,7 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     @Test
     public void modeAfterInitAllow() {
         AllowDisallowIndexingProcessorFactory factory = initializedFactory(createAllowConfig());
-        assertEquals(AllowDisallowMode.ALLOW, factory.getMode());
+        assertEquals(AllowDisallowMode.Allow(), factory.getMode());
     }
 
     /**
@@ -146,7 +145,7 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     @Test
     public void modeAfterInitDisallow() {
         AllowDisallowIndexingProcessorFactory factory = initializedFactory(createDisallowConfig());
-        assertEquals(AllowDisallowMode.DISALLOW, factory.getMode());
+        assertEquals(AllowDisallowMode.Disallow(), factory.getMode());
     }
 
     /**
@@ -155,7 +154,7 @@ public class AllowDisallowIndexingProcessorFactoryTest {
     @Test
     public void modeAfterInitNoMode() {
         AllowDisallowIndexingProcessorFactory factory = initializedFactory(createUnknownValueConfig());
-        assertEquals(AllowDisallowMode.UNKNOWN, factory.getMode());
+        assertEquals(AllowDisallowMode.Unknown(), factory.getMode());
     }
 
 

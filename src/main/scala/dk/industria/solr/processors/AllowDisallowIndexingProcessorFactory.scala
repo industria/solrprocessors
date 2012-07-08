@@ -72,7 +72,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
     /**
      * Mode configured
      */
-    private var mode = AllowDisallowMode.UNKNOWN
+    private var mode = AllowDisallowMode.Unknown
     /**
      * List of field match rules configured.
      */
@@ -158,7 +158,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
      *
      * @return Mode of operation as a AllowDisallowMode enum.
      */
-    def getMode(): AllowDisallowMode = {
+    def getMode(): AllowDisallowMode.Value = {
         return this.mode;
     }
 
@@ -184,17 +184,17 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
       val allow = getConfiguredList(args, "allow")
       if (null != allow) {
         logger.debug("Running with allow semantics: {}", allow.toString())
-        this.mode = AllowDisallowMode.ALLOW
+        this.mode = AllowDisallowMode.Allow
         this.rules = getFieldMatchRules(allow)
       } else {
 	val disallow = getConfiguredList(args, "disallow")
 	if (null != disallow) {
           logger.debug("Running with disallow semantics: {}", disallow.toString())
-          this.mode = AllowDisallowMode.DISALLOW
+          this.mode = AllowDisallowMode.Disallow
           this.rules = getFieldMatchRules(disallow)
 	} else {
           logger.warn("No rules configured for the processor. Consider removing it from chain.")
-          this.mode = AllowDisallowMode.UNKNOWN;
+          this.mode = AllowDisallowMode.Unknown;
 	}
       }
     }

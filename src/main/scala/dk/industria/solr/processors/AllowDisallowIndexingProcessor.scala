@@ -39,7 +39,7 @@ import scala.collection.JavaConverters._
  * @param uniqueKey Name of the document unique key. Null is no unique key is defined in the schema.
  * @param next      Next UpdateRequestProcessor in the processor chain.
  */
-class AllowDisallowIndexingProcessor(mode: AllowDisallowMode, rules: List[FieldMatchRule], uniqueKey: String, next: UpdateRequestProcessor) extends UpdateRequestProcessor(next) {
+class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[FieldMatchRule], uniqueKey: String, next: UpdateRequestProcessor) extends UpdateRequestProcessor(next) {
     /**
      * Logger
      * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
@@ -97,16 +97,16 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode, rules: List[FieldM
      */
     @throws(classOf[IOException])
     override def processAdd(cmd: AddUpdateCommand) = {
-      if (this.mode == AllowDisallowMode.UNKNOWN) {
+      if (this.mode == AllowDisallowMode.Unknown) {
         logger.warn("Mode UNKNOWN, indexing, check configuration!")
         super.processAdd(cmd)
       } else {
         val document = cmd.getSolrInputDocument()
         val ruleMatch = rulesMatch(this.rules, document)
 	
-        if ((this.mode == AllowDisallowMode.ALLOW) && (!ruleMatch)) {
+        if ((this.mode == AllowDisallowMode.Allow) && (!ruleMatch)) {
           logger.info("DocId [{}] discarded - allow mode without rule match", uniqueKeyValue(document))
-        } else if ((this.mode == AllowDisallowMode.DISALLOW) && (ruleMatch)) {
+        } else if ((this.mode == AllowDisallowMode.Disallow) && (ruleMatch)) {
           logger.info("DocId [{}] discarded - disallow mode with rule match", uniqueKeyValue(document))
         } else {
           logger.info("DocId [{}] indexing", uniqueKeyValue(document))
