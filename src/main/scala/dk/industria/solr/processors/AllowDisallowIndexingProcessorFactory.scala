@@ -64,19 +64,19 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
  * }
  * </pre>
  */
-public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactory {
+class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactory {
     /**
      * Logger
      */
-    private static final Logger logger = LoggerFactory.getLogger(AllowDisallowIndexingProcessorFactory.class);
+    private val logger = LoggerFactory.getLogger(getClass)
     /**
      * Mode configured
      */
-    private AllowDisallowMode mode = AllowDisallowMode.UNKNOWN;
+    private var mode = AllowDisallowMode.UNKNOWN
     /**
      * List of field match rules configured.
      */
-    private List<FieldMatchRule> rules;
+    private var rules: List[FieldMatchRule] = null
 
     /**
      * Get the NamedList associated with a key.
@@ -85,13 +85,14 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * @param key  The key to look for in the list.
      * @return NamedList associated with the key or null if the keys isn't in the args or isn't a NamedList.
      */
-    private NamedList getConfiguredList(NamedList args, String key) {
-        Object o = args.get(key);
-        if (o instanceof NamedList) {
-            return (NamedList) o;
-        }
-        logger.debug("Key [{}] not in configuration arguments", key);
-        return null;
+    private def getConfiguredList(args: NamedList[_], key: String): NamedList[_] = {
+      val o = args.get(key);
+      if ((null != o) && o.isInstanceOf[NamedList[_]]) {
+        return o.asInstanceOf[NamedList[_]]
+      } else {
+	logger.debug("Key [{}] not in configuration arguments", key)
+	return null
+      }
     }
 
     /**
@@ -100,41 +101,38 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * @param configuration The NamedList of allow/disallow lst element (solrconfig.xml).
      * @return List of FieldMatchRule items.
      */
-    private List<FieldMatchRule> getFieldMatchRules(NamedList configuration) {
-        List<FieldMatchRule> rules = new ArrayList<FieldMatchRule>();
-
-        @SuppressWarnings("unchecked")
-        Iterator<Map.Entry<String, ?>> itr = (Iterator<Map.Entry<String, ?>>) configuration.iterator();
+    private def getFieldMatchRules(configuration: NamedList[_]): List[FieldMatchRule] = {
+        var rules: List[FieldMatchRule] = new ArrayList[FieldMatchRule]
+	//Iterator[Map.Entry[String, ?]]
+        val itr = configuration.iterator()
         while (itr.hasNext()) {
-            Map.Entry<String, ?> kv = itr.next();
-            String key = kv.getKey();
+            val kv: Map.Entry[String, _] = itr.next()
+            val key = kv.getKey()
             if ((null == key) || (0 == key.trim().length())) {
-                logger.warn("Item missing name attribute: {}", kv.toString());
-                continue;
-            }
-
-            Object oValue = kv.getValue();
-            if (!(oValue instanceof String)) {
-                logger.warn("Item not a <str> element: {}", kv.toString());
-                continue;
-            }
-
-            String value = ((String) oValue).trim();
-            if (0 == value.length()) {
-                logger.warn("Item trimmed value is empty: {}", kv.toString());
-                continue;
-            }
-
-            try {
-                FieldMatchRule rule = new FieldMatchRule(key, value);
-                rules.add(rule);
-                logger.debug("Added FieldMatchRule : {}", rule.toString());
-            } catch (IllegalArgumentException e) {
-                logger.warn("Couldn't create FieldMatchRule: {}", e.getMessage());
-            }
+                logger.warn("Item missing name attribute: {}", kv.toString())
+            } else { 
+              val oValue = kv.getValue()
+              if (!oValue.isInstanceOf[String]) {
+                logger.warn("Item not a <str> element: {}", kv.toString())
+              } else {
+		val value = oValue.asInstanceOf[String].trim()
+		if (0 == value.length()) {
+                  logger.warn("Item trimmed value is empty: {}", kv.toString())
+		} else {
+		  try {
+                    val rule = new FieldMatchRule(key, value)
+                    rules.add(rule)
+                    logger.debug("Added FieldMatchRule : {}", rule.toString())
+		  } catch {
+		    case e: IllegalArgumentException =>
+                      logger.warn("Couldn't create FieldMatchRule: {}", e.getMessage())
+		  }
+		}
+	      }
+	    }
         }
-        logger.info("Rules configured: {}", rules.toString());
-        return rules;
+        logger.info("Rules configured: {}", rules.toString())
+        return rules
     }
 
     /**
@@ -143,13 +141,17 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * @param request SolrQueryRequest
      * @return String containing the name of the schema unique key or null it one is not defined.
      */
-    private String uniqueKey(SolrQueryRequest request) {
-        if (null == request) return null;
+    private def uniqueKey(request: SolrQueryRequest): String = {
+      if (null == request) return null
 
-        SolrCore core = request.getCore();
-        IndexSchema schema = core.getSchema();
-        SchemaField field = schema.getUniqueKeyField();
-        return (null != field) ? field.getName() : null;
+      val core = request.getCore()
+      val schema = core.getSchema()
+      val field = schema.getUniqueKeyField()
+      if (null != field) {
+	return field.getName()
+      } else {  
+	return null
+      }
     }
 
     /**
@@ -157,7 +159,7 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      *
      * @return Mode of operation as a AllowDisallowMode enum.
      */
-    public AllowDisallowMode getMode() {
+    def getMode(): AllowDisallowMode = {
         return this.mode;
     }
 
@@ -166,9 +168,9 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      *
      * @return Unmodifiable list of rules.
      */
-    public List<FieldMatchRule> getRules() {
+    def getRules(): List[FieldMatchRule] = {
         if (null == rules) {
-            return Collections.unmodifiableList(new ArrayList<FieldMatchRule>());
+            return Collections.unmodifiableList(new ArrayList[FieldMatchRule]);
         }
         return Collections.unmodifiableList(rules);
     }
@@ -179,26 +181,23 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      *
      * @param args NamedList of parameters set in the processor definition in solrconfig.xml
      */
-    @Override
-    public void init(final NamedList args) {
-        NamedList allow = getConfiguredList(args, "allow");
-        if (null != allow) {
-            logger.debug("Running with allow semantics: {}", allow.toString());
-            this.mode = AllowDisallowMode.ALLOW;
-            this.rules = getFieldMatchRules(allow);
-            return;
-        }
-
-        NamedList disallow = getConfiguredList(args, "disallow");
-        if (null != disallow) {
-            logger.debug("Running with disallow semantics: {}", disallow.toString());
-            this.mode = AllowDisallowMode.DISALLOW;
-            this.rules = getFieldMatchRules(disallow);
-            return;
-        }
-
-        logger.warn("No rules configured for the processor. Consider removing it from chain.");
-        this.mode = AllowDisallowMode.UNKNOWN;
+    override def init(args: NamedList[_]) {
+      val allow = getConfiguredList(args, "allow")
+      if (null != allow) {
+        logger.debug("Running with allow semantics: {}", allow.toString())
+        this.mode = AllowDisallowMode.ALLOW
+        this.rules = getFieldMatchRules(allow)
+      } else {
+	val disallow = getConfiguredList(args, "disallow")
+	if (null != disallow) {
+          logger.debug("Running with disallow semantics: {}", disallow.toString())
+          this.mode = AllowDisallowMode.DISALLOW
+          this.rules = getFieldMatchRules(disallow)
+	} else {
+          logger.warn("No rules configured for the processor. Consider removing it from chain.")
+          this.mode = AllowDisallowMode.UNKNOWN;
+	}
+      }
     }
 
     /**
@@ -209,10 +208,9 @@ public class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcesso
      * @param updateRequestProcessor UpdateRequestProcessor
      * @return Instance of AllowDisallowIndexingProcessor initialized with the fields to process.
      */
-    @Override
-    public UpdateRequestProcessor getInstance(SolrQueryRequest solrQueryRequest, SolrQueryResponse solrQueryResponse, UpdateRequestProcessor updateRequestProcessor) {
-        String uniqueFieldName = uniqueKey(solrQueryRequest);
-        return new AllowDisallowIndexingProcessor(this.mode, this.rules, uniqueFieldName, updateRequestProcessor);
+    override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse, updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
+      val uniqueFieldName = uniqueKey(solrQueryRequest)
+      new AllowDisallowIndexingProcessor(this.mode, this.rules, uniqueFieldName, updateRequestProcessor)
     }
 
 }
