@@ -103,10 +103,9 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
      */
     private def getFieldMatchRules(configuration: NamedList[_]): List[FieldMatchRule] = {
         var rules: List[FieldMatchRule] = new ArrayList[FieldMatchRule]
-	//Iterator[Map.Entry[String, ?]]
         val itr = configuration.iterator()
         while (itr.hasNext()) {
-            val kv: Map.Entry[String, _] = itr.next()
+            val kv = itr.next()
             val key = kv.getKey()
             if ((null == key) || (0 == key.trim().length())) {
                 logger.warn("Item missing name attribute: {}", kv.toString())
