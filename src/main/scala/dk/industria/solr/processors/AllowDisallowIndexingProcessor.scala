@@ -57,8 +57,7 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
     rules.exists(
       (rule: FieldMatchRule) => {
 	logger.debug("Testing rule: {}", rule)
-	val ruleField = rule.field
-	val fieldValues = document.getFieldValues(ruleField)
+	val fieldValues = document.getFieldValues(rule.field)
 
 	fieldValues.asScala.exists(
 	  (v: Any) => {
