@@ -48,13 +48,12 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
   private val logger = LoggerFactory.getLogger(getClass())
 
   /**
-   * Indicates if running the rules results on a match in the document.
+   * Indicates if running the rules results in a match on the document.
    *
-   * @param rules    List of field match rules to run against the document.
    * @param document SolrInputDocument to run rules against.
    * @return True if one of the rules matched the document.
    */
-  private def rulesMatch(rules: List[FieldMatchRule], document: SolrInputDocument): Boolean = {
+  private def rulesMatch(document: SolrInputDocument): Boolean = {
     rules.exists(
       (rule: FieldMatchRule) => {
 	logger.debug("Testing rule: {}", rule)
@@ -108,7 +107,7 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
       super.processAdd(cmd)
     } else {
       val document = cmd.getSolrInputDocument()
-      val ruleMatch = rulesMatch(this.rules, document)
+      val ruleMatch = rulesMatch(document)
       
       val documentUniqueKeyValue = uniqueKeyValue(document)
       if ((this.mode == AllowDisallowMode.Allow) && (!ruleMatch)) {
