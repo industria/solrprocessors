@@ -12,7 +12,11 @@ Installation
    and place the jar-file in that folder. Solr will add the files in that folder to
    the classpath on startup.
 
-3) Define an update request processor chain with the processors needed.
+3) Make sure you have scala-library-2.9.2.jar in the classpath
+   You can place it in the lib folder as described above if you don't have it
+   available in the classpath of the container already.
+
+4) Define an update request processor chain with the processors needed.
    Below is an example with four processor factories AllowDisallowIndexingProcessorFactory,
    HTMLStripCharFilterProcessorFactory, LogUpdateProcessorFactory and RunUpdateProcessorFactory.
 
@@ -30,7 +34,7 @@ Installation
      <processor class="solr.RunUpdateProcessorFactory" />
    </updateRequestProcessorChain>
 
-4) Register the processor chain with your update request handler as shown below
+5) Register the processor chain with your update request handler as shown below
 
    <requestHandler name="/update" class="solr.XmlUpdateRequestHandler">
      <lst name="defaults">
