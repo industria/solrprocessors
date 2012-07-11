@@ -145,12 +145,8 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
     
     val core = request.getCore()
     val schema = core.getSchema()
-    val field = schema.getUniqueKeyField()
-    if (null != field) {
-      Some(field.getName())
-    } else {  
-      None
-    }
+    val field = Option(schema.getUniqueKeyField())
+    field.map { _.getName() }
   }
 
   /**
