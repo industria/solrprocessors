@@ -88,11 +88,9 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
    * @return String representation of the documents unique value key.
    */
   private def uniqueKeyValue(document: SolrInputDocument): String = {
-    if (this.uniqueKey.isDefined) {
-      val value = document.getFieldValue(this.uniqueKey.get)
-      String.valueOf(value)
-    } else {
-      ""
+    uniqueKey match {
+      case Some(x) => String.valueOf(document.getFieldValue(x))
+      case None => ""
     }
   }
 
