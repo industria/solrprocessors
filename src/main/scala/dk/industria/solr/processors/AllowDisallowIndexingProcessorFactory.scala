@@ -212,9 +212,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    * @return Instance of AllowDisallowIndexingProcessor initialized with the fields to process.
    */
   override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse, updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
-    uniqueKey(solrQueryRequest) match {
-      case Some(x) => new AllowDisallowIndexingProcessor(this.mode, _rules, x, updateRequestProcessor)
-      case None =>  new AllowDisallowIndexingProcessor(this.mode, _rules, null, updateRequestProcessor)
-    }
+    val uniqueKeyField = uniqueKey(solrQueryRequest)
+    new AllowDisallowIndexingProcessor(this.mode, _rules, uniqueKeyField, updateRequestProcessor)
   }
 }

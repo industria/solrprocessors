@@ -38,7 +38,7 @@ import scala.collection.JavaConverters._
  * @param uniqueKey Name of the document unique key. Null is no unique key is defined in the schema.
  * @param next      Next UpdateRequestProcessor in the processor chain.
  */
-class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[FieldMatchRule], uniqueKey: String, next: UpdateRequestProcessor) extends UpdateRequestProcessor(next) {
+class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[FieldMatchRule], uniqueKey: Option[String], next: UpdateRequestProcessor) extends UpdateRequestProcessor(next) {
   /**
    * Logger
    * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
@@ -88,10 +88,12 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
    * @return String representation of the documents unique value key.
    */
   private def uniqueKeyValue(document: SolrInputDocument): String = {
-    if (null == this.uniqueKey) return ""
-    
-    val value = document.getFieldValue(this.uniqueKey)
-    return String.valueOf(value);
+    if (this.uniqueKey.isDefined) {
+      val value = document.getFieldValue(this.uniqueKey.get)
+      String.valueOf(value)
+    } else {
+      ""
+    }
   }
 
   /**
@@ -110,12 +112,13 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
       val document = cmd.getSolrInputDocument()
       val ruleMatch = rulesMatch(this.rules, document)
       
+      val documentUniqueKeyValue = uniqueKeyValue(document)
       if ((this.mode == AllowDisallowMode.Allow) && (!ruleMatch)) {
-        logger.info("DocId [{}] discarded - allow mode without rule match", uniqueKeyValue(document))
+        logger.info("DocId [{}] discarded - allow mode without rule match", documentUniqueKeyValue)
       } else if ((this.mode == AllowDisallowMode.Disallow) && (ruleMatch)) {
-        logger.info("DocId [{}] discarded - disallow mode with rule match", uniqueKeyValue(document))
+        logger.info("DocId [{}] discarded - disallow mode with rule match", documentUniqueKeyValue)
       } else {
-        logger.info("DocId [{}] indexing", uniqueKeyValue(document))
+        logger.info("DocId [{}] indexing", documentUniqueKeyValue)
         super.processAdd(cmd)
       }
     }
