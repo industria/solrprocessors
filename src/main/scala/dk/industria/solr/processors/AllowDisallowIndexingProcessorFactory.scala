@@ -183,13 +183,13 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
   override def init(args: NamedList[_]) {
     val allow = getConfiguredList(args, "allow")
     if (null != allow) {
-      logger.debug("Running with allow semantics: {}", allow.toString())
+      logger.debug("Running with allow semantics: {}", allow)
       this.mode = AllowDisallowMode.Allow
       _rules = getFieldMatchRules(allow)
     } else {
       val disallow = getConfiguredList(args, "disallow")
       if (null != disallow) {
-        logger.debug("Running with disallow semantics: {}", disallow.toString())
+        logger.debug("Running with disallow semantics: {}", disallow)
         this.mode = AllowDisallowMode.Disallow
 	_rules = getFieldMatchRules(disallow)
       } else {
