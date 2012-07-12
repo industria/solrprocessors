@@ -116,6 +116,7 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
 
   /**
    * Get the list of field names configured for processing.
+   * Used for Java test cases.
    *
    * @return Unmodifiable list of field names configured.
    */
@@ -161,6 +162,6 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
    */
   override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse , updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
-    new HTMLStripCharFilterProcessor(this.getFields(), this.getNormalize(), updateRequestProcessor);
+    new HTMLStripCharFilterProcessor(fieldsToProcess, spaceNormalize, updateRequestProcessor);
   }
 }
