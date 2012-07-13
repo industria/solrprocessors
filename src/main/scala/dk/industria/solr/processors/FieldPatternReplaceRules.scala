@@ -63,10 +63,6 @@ class FieldPatternReplaceRules(fieldName: String) {
    */
   def replace(value: String): String = {
     require(null != value)
-    var newValue = value
-    for(rule <- rules) {
-      newValue = rule.replace(newValue)
-    }
-    newValue;
+    (value /: rules)((v, rule) => rule.replace(v))
   }
 }
