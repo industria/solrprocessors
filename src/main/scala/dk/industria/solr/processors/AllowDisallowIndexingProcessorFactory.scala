@@ -20,23 +20,19 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 import org.apache.solr.core.SolrCore;
-import org.apache.solr.schema.IndexSchema;
-import org.apache.solr.schema.SchemaField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.solr.schema.{IndexSchema, SchemaField}
 
 import org.apache.solr.common.util.NamedList;
 
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
 
-import org.apache.solr.update.processor.UpdateRequestProcessor;
-import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
+import org.apache.solr.update.processor.{UpdateRequestProcessor, UpdateRequestProcessorFactory}
+
+import org.slf4j.LoggerFactory;
 
 import scala.collection.JavaConverters._
-
 
 /**
  * Implements a factory for the AllowDisallowIndexingProcessor
@@ -83,16 +79,10 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    *
    * @param args The NamedList to look for the key.
    * @param key  The key to look for in the list.
-   * @return NamedList associated with the key or null if the keys isn't in the args or isn't a NamedList.
+   * @return Option NamedList associated with the key.
    */
-  private def getConfiguredList(args: NamedList[_], key: String): NamedList[_] = {
-    val o = args.get(key);
-    if ((null != o) && o.isInstanceOf[NamedList[_]]) {
-      return o.asInstanceOf[NamedList[_]]
-    } else {
-      logger.debug("Key [{}] not in configuration arguments", key)
-      return null
-    }
+  private def getConfiguredList(args: NamedList[_], key: String): Option[NamedList[_]] = {
+    Option(args.get(key)).filter(_.isInstanceOf[NamedList[_]]).map(_.asInstanceOf[NamedList[_]])
   }
 
   /**
@@ -108,29 +98,28 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
       val kv = itr.next()
       val key = kv.getKey()
       if ((null == key) || (0 == key.trim().length())) {
-        logger.warn("Item missing name attribute: {}", kv.toString())
+        logger.warn("Item missing name attribute: {}", kv)
       } else { 
         val oValue = kv.getValue()
         if (!oValue.isInstanceOf[String]) {
-          logger.warn("Item not a <str> element: {}", kv.toString())
+          logger.warn("Item not a <str> element: {}", kv)
         } else {
 	  val value = oValue.asInstanceOf[String].trim()
 	  if (0 == value.length()) {
-            logger.warn("Item trimmed value is empty: {}", kv.toString())
+            logger.warn("Item trimmed value is empty: {}", kv)
 	  } else {
 	    try {
               val rule = new FieldMatchRule(key, value)
 	      rules = rule :: rules
-              logger.debug("Added FieldMatchRule : {}", rule.toString())
+              logger.debug("Added FieldMatchRule : {}", rule)
 	    } catch {
-	      case e: IllegalArgumentException =>
-                logger.warn("Couldn't create FieldMatchRule: {}", e.getMessage())
+	      case e: IllegalArgumentException => logger.warn("Couldn't create FieldMatchRule: {}", e.getMessage())
 	    }
 	  }
 	}
       }
     }
-    logger.info("Rules configured: {}", rules.toString())
+    logger.info("Rules configured: {}", rules)
     return rules.reverse
   }
 
@@ -138,15 +127,14 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    * Get the name of the unique key defined for the schema.
    *
    * @param request SolrQueryRequest
-   * @return String containing the name of the schema unique key or null it one is not defined.
+   * @return Option String containing the name of the schema unique key.
    */
   private def uniqueKey(request: SolrQueryRequest): Option[String] = {
-    if (null == request) return None
-    
+    if(null == request) return None
+
     val core = request.getCore()
     val schema = core.getSchema()
-    val field = Option(schema.getUniqueKeyField())
-    field.map { _.getName() }
+    Option(schema.getUniqueKeyField()).map(_.getName())
   }
 
   /**
@@ -154,9 +142,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    *
    * @return Mode of operation as a AllowDisallowMode enum.
    */
-  def getMode(): AllowDisallowMode.Value = {
-    return this.mode;
-  }
+  def getMode(): AllowDisallowMode.Value = mode
 
   /**
    * Get the list of field match rules configured.
@@ -164,9 +150,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    *
    * @return Unmodifiable list of rules.
    */
-  def getRules(): java.util.List[FieldMatchRule] = {
-    return Collections.unmodifiableList(_rules.asJava);
-  }
+  def getRules(): java.util.List[FieldMatchRule] = Collections.unmodifiableList(_rules.asJava)
 
   /**
    * Get the list of field match rules configured.
@@ -182,16 +166,16 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    */
   override def init(args: NamedList[_]) {
     val allow = getConfiguredList(args, "allow")
-    if (null != allow) {
-      logger.debug("Running with allow semantics: {}", allow)
+    if (allow.isDefined) {
+      logger.debug("Running with allow semantics: {}", allow.get)
       this.mode = AllowDisallowMode.Allow
-      _rules = getFieldMatchRules(allow)
+      _rules = getFieldMatchRules(allow.get)
     } else {
       val disallow = getConfiguredList(args, "disallow")
-      if (null != disallow) {
-        logger.debug("Running with disallow semantics: {}", disallow)
+      if (disallow.isDefined) {
+        logger.debug("Running with disallow semantics: {}", disallow.get)
         this.mode = AllowDisallowMode.Disallow
-	_rules = getFieldMatchRules(disallow)
+	_rules = getFieldMatchRules(disallow.get)
       } else {
         logger.warn("No rules configured for the processor. Consider removing it from chain.")
         this.mode = AllowDisallowMode.Unknown;
