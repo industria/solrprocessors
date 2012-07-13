@@ -15,30 +15,20 @@
  */
 package dk.industria.solr.processors;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Collection;
-import java.util.ArrayList;
+import java.io.{BufferedReader, IOException, Reader, StringReader}
+import java.util.{ArrayList, Collection}
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.lucene.analysis.{CharReader, CharStream}
 
-import org.apache.lucene.analysis.CharReader;
-import org.apache.lucene.analysis.CharStream;
+import org.apache.solr.analysis.HTMLStripCharFilter
 
-import org.apache.solr.analysis.HTMLStripCharFilter;
+import org.apache.solr.common.{SolrInputDocument, SolrInputField}
 
+import org.apache.solr.update.AddUpdateCommand
 
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
-
-
-import org.apache.solr.update.AddUpdateCommand;
-
-import org.apache.solr.update.processor.UpdateRequestProcessor;
+import org.apache.solr.update.processor.UpdateRequestProcessor
 
 import scala.collection.JavaConverters._
 
@@ -73,8 +63,8 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
    * trimming the string for leading and trailing spaces and finally removing
    * duplicate spaces from the string.
    *
-   * @param text String to space normalize..
-   * @return String with normalized spaces..
+   * @param text String to space normalize.
+   * @return String with normalized spaces.
    */
   private def normalizeSpace(text: String): String = {
     // Replace no-break space

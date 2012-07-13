@@ -17,17 +17,14 @@ package dk.industria.solr.processors
 
 import java.util.Collections
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
 import org.apache.solr.common.util.NamedList
 
 import org.apache.solr.request.SolrQueryRequest
 import org.apache.solr.response.SolrQueryResponse
 
+import org.apache.solr.update.processor.{UpdateRequestProcessor, UpdateRequestProcessorFactory}
 
-import org.apache.solr.update.processor.UpdateRequestProcessor
-import org.apache.solr.update.processor.UpdateRequestProcessorFactory
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
@@ -102,16 +99,11 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    * If a bool element with normalize name attribute does not exists in
    * the arguments it will default to true.
    *
-   * @param initArguments NamedList containing the init arguments.
+   * @param args NamedList containing the init arguments.
    * @return True if space normalization should be turned on.
    */
-  private def extractSpaceNormalization(initArguments: NamedList[_]): Boolean = {
-    val oValue = initArguments.get("normalize");
-    if ((oValue != null) && oValue.isInstanceOf[Boolean]) {
-      oValue.asInstanceOf[Boolean]
-    } else {
-      true
-    }
+  private def extractSpaceNormalization(args: NamedList[_]): Boolean = {
+    Option(args.get("normalize")).filter(_.isInstanceOf[Boolean]).map(_.asInstanceOf[Boolean]).getOrElse(true)
   }
 
   /**
@@ -120,18 +112,14 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    *
    * @return Unmodifiable list of field names configured.
    */
-  def getFields(): java.util.List[String] = {
-    Collections.unmodifiableList(fieldsToProcess.asJava);
-  }
+  def getFields(): java.util.List[String] = Collections.unmodifiableList(fieldsToProcess.asJava)
 
   /**
    * Get space normalization setting.
    *
    * @return True is space normalization should be performed in the processor.
    */
-  def getNormalize(): Boolean = {
-    this.spaceNormalize;
-  }
+  def getNormalize(): Boolean = spaceNormalize
   
   /**
    * Init called by Solr processor chain
@@ -140,16 +128,14 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
    */
   override def init(args: NamedList[_]) = {
-    this.spaceNormalize = extractSpaceNormalization(args);
+    spaceNormalize = extractSpaceNormalization(args)
+    logger.debug("Configured with space normalization set to: {}", spaceNormalize)
     
-    logger.debug("Configured with space normalization set to: {}", String.valueOf(this.spaceNormalize));
+    fieldsToProcess = extractFields(args)
+    logger.debug("Configured with fields [{}]", configuredFieldsString(fieldsToProcess))
     
-    this.fieldsToProcess = extractFields(args);
-    
-    logger.debug("Configured with fields [{}]", configuredFieldsString(this.fieldsToProcess));
-    
-    if (this.fieldsToProcess.isEmpty) {
-            logger.warn("No fields configured. Consider removing the processor.");
+    if (fieldsToProcess.isEmpty) {
+      logger.warn("No fields configured. Consider removing the processor.")
     }
   }
 
@@ -162,6 +148,6 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
    */
   override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse , updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
-    new HTMLStripCharFilterProcessor(fieldsToProcess, spaceNormalize, updateRequestProcessor);
+    new HTMLStripCharFilterProcessor(fieldsToProcess, spaceNormalize, updateRequestProcessor)
   }
 }
