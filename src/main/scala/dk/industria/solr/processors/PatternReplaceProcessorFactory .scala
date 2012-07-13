@@ -15,19 +15,17 @@
  */
 package dk.industria.solr.processors
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
 import org.apache.solr.common.util.NamedList
-
 import org.apache.solr.request.SolrQueryRequest
 import org.apache.solr.response.SolrQueryResponse
+import org.apache.solr.update.processor.{UpdateRequestProcessor, UpdateRequestProcessorFactory}
 
-import org.apache.solr.update.processor.UpdateRequestProcessor
-import org.apache.solr.update.processor.UpdateRequestProcessorFactory
+import org.slf4j.LoggerFactory
+
+import scala.collection.immutable.HashMap
 
 import scala.collection.JavaConverters._
-import scala.collection.immutable.HashMap
+
 /**
  * Implements a factory for the PatternReplaceProcessor used by the Solr update request processor chain.
  * <p/>
@@ -90,15 +88,10 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    *
    * @param args NamedList to get the String from.
    * @param name String containing the name of the name attribute to retrieve.
-   * @return Value of the name attribute. Null if the value isn't a String or doesn't exists.
+   * @return Option value of the name attribute. 
    */
-  private def getStringElement(args: NamedList[_], name: String): String = {
-    val o = args.get(name);
-    if(o.isInstanceOf[String]) {
-      o.asInstanceOf[String]
-    } else {
-      null
-    }
+  private def getStringElement(args: NamedList[_], name: String): Option[String] = {
+    Option(args.get(name)).filter(_.isInstanceOf[String]).map(_.asInstanceOf[String])
   }
 
   /**
@@ -109,39 +102,34 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    * id, pattern and replace.
    *
    * @param args NamedList as supplied by the processor chain.
-   * @return Map of PatternReplaceRule extracted from the processor arguments keyed by id..
+   * @return Map of PatternReplaceRule extracted from the processor arguments keyed by id.
    */
   private def extractRules(args: NamedList[_]): Map[String, PatternReplaceRule] = {
     var rules: Map[String, PatternReplaceRule] = new HashMap
     
-    val ruleElements = args.getAll("rule").asScala
+    val ruleElements = args.getAll("rule").asScala.filter(_.isInstanceOf[NamedList[_]]).map(_.asInstanceOf[NamedList[_]])
     for(ruleElement <- ruleElements) {
-      
-      if(!(ruleElement.isInstanceOf[NamedList[_]])) {
-        logger.warn("Element with name attribute set to rule but it is not a <lst> element. Check your configuration.")
-      } else { 
-	try {
-          val id = getStringElement(ruleElement.asInstanceOf[NamedList[_]], "id")
-          if(null == id) {
-            logger.warn("id not found for rule")
+      try {
+        val id = getStringElement(ruleElement, "id")
+        if(id.isEmpty) {
+          logger.warn("id not found for rule")
+        } else {
+          val pattern = getStringElement(ruleElement, "pattern")
+          if(pattern.isEmpty) {
+            logger.warn("pattern not found for rule")
           } else {
-            val pattern = getStringElement(ruleElement.asInstanceOf[NamedList[_]], "pattern")
-            if(null == pattern) {
-              logger.warn("pattern not found for rule")
+            val replace = getStringElement(ruleElement, "replace")
+            if(replace.isEmpty) {
+	      logger.warn("replace not found for rule")
             } else {
-              val replace = getStringElement(ruleElement.asInstanceOf[NamedList[_]], "replace")
-              if(null == replace) {
-		logger.warn("replace not found for rule")
-              } else {
-		val rule = PatternReplaceRule.getInstance(id, pattern, replace)
-		rules = rules.updated(id, rule)
-		logger.info("Added rule: {}", rule.toString())
-	      }
+	      val rule = PatternReplaceRule.getInstance(id.get, pattern.get, replace.get)
+	      rules = rules.updated(id.get, rule)
+	      logger.info("Added rule: {}", rule)
 	    }
 	  }
-	} catch { 
-	  case e: IllegalArgumentException => logger.warn("Unable to create rule for {}, error was {}", ruleElement.toString(), e.getMessage())
 	}
+      } catch { 
+	case e: IllegalArgumentException => logger.warn("Unable to create rule for {}, error was {}", ruleElement, e.getMessage())
       }
     }
     rules
@@ -154,24 +142,19 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    * @return List of field pattern replace rules.
    */
   private def extractFieldRuleMappings(args: NamedList[_]): List[FieldPatternReplaceRules] = {
-    val idRules: Map[String, PatternReplaceRule] = extractRules(args)
-    
     var fieldPatternRules: Map[String, FieldPatternReplaceRules] = new HashMap
     
-    val fieldsElement = args.get("fields")
-    if(fieldsElement.isInstanceOf[NamedList[_]]) {
-      //Iterator<Map.Entry<String, ?>> itr = (Iterator<Map.Entry<String, ?>>)((NamedList)fieldsElement).iterator();
-      val itr = fieldsElement.asInstanceOf[NamedList[_]].iterator()
+    val idRules: Map[String, PatternReplaceRule] = extractRules(args)
+    
+    val fieldsElement = Option(args.get("fields")).filter(_.isInstanceOf[NamedList[_]]).map(_.asInstanceOf[NamedList[_]])
+    if (fieldsElement.isDefined) {
+      val itr = fieldsElement.get.iterator()
       while (itr.hasNext()) {
         val kv = itr.next()
         if(kv.getValue().isInstanceOf[String]) {
           val fieldName = kv.getKey()
 	  val ruleId = kv.getValue().asInstanceOf[String]
-	  
-          // TODO: might need to check fieldName for null
-	  
-          // Make sure there is a FieldPatternReplaceRules attached to the
-          // field in the fieldPatternRules
+          // Make sure there is a FieldPatternReplaceRules attached to the field in the fieldPatternRules
           var fr = fieldPatternRules.get(fieldName) match {
 	    case None => { 
 	      val fprr = new FieldPatternReplaceRules(fieldName)
@@ -180,14 +163,13 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
 	    }
 	    case Some(x) => x
 	  }
-
-          if(idRules.contains(ruleId)) {
-            fr.add(idRules.get(ruleId).get)
-          } else {
-            logger.warn("Unknown rule id {}", String.valueOf(ruleId))
-          }
+	  
+	  idRules.get(ruleId) match {
+	    case Some(x) => fr.add(x)
+	    case None => logger.warn("Unknown rule id {}", ruleId)
+	  }
         } else {
-          logger.warn("Element in fields list not a <str> element [{}]", String.valueOf(kv))
+          logger.warn("Element in fields list not a <str> element [{}]", kv)
         }
       }
     } else {
@@ -198,6 +180,7 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
 
   /**
    * Get collection of field pattern replace rules.
+   * Used by the Java based test cases.
    *
    * @return Unmodifiable collection of pattern replace rules.
    */
@@ -209,11 +192,9 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
    */
   override def init(args: NamedList[_]) = {
-    this.fieldPatternRules = extractFieldRuleMappings(args)
+    fieldPatternRules = extractFieldRuleMappings(args)
     if(logger.isInfoEnabled()) {
-      for(fieldRules <- this.fieldPatternRules) {
-        logger.info("Field [{}] configured with rule {}", fieldRules.getFieldName(), String.valueOf(fieldRules))
-      }
+      fieldPatternRules.foreach((rule) => logger.info("Field [{}] configured with rule {}", rule.getFieldName(), rule)   )
     }
   }
   
@@ -226,6 +207,6 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    * @return Instance of PatternReplaceProcessor configured with field list and rule mapping.
    */
   override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse, updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
-    new PatternReplaceProcessor(this.fieldPatternRules, updateRequestProcessor);
+    new PatternReplaceProcessor(fieldPatternRules, updateRequestProcessor);
   }
 }
