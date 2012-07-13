@@ -15,21 +15,17 @@
  */
 package dk.industria.solr.processors;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.IOException
+import java.util.{ArrayList, Collection}
 
-import org.apache.solr.client.solrj.request.UpdateRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.solr.client.solrj.request.UpdateRequest
 
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
+import org.apache.solr.common.{SolrInputDocument, SolrInputField}
 
+import org.apache.solr.update.AddUpdateCommand
+import org.apache.solr.update.processor.UpdateRequestProcessor
 
-import org.apache.solr.update.AddUpdateCommand;
-
-import org.apache.solr.update.processor.UpdateRequestProcessor;
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
@@ -37,7 +33,7 @@ class PatternReplaceProcessor(fieldPatternRules: List[FieldPatternReplaceRules],
   /**
    * Logger
    */
-  private val logger = LoggerFactory.getLogger(getClass());
+  private val logger = LoggerFactory.getLogger(getClass())
 
   /**
    * Called by the processor chain on document add/update operations.
@@ -60,19 +56,17 @@ class PatternReplaceProcessor(fieldPatternRules: List[FieldPatternReplaceRules],
 	  val newValues: Collection[Object] = new ArrayList[Object]()
 	  for (value <- values.asScala) {
             if (value.isInstanceOf[String]) {
-              var newValue = fieldRules.replace(value.asInstanceOf[String]);
+              var newValue = fieldRules.replace(value.asInstanceOf[String])
               newValues.add(newValue);
             } else {
               newValues.add(value);
             }
 	  }
-	  val boost = field.getBoost();
-	  field.setValue(newValues, boost);
+	  val boost = field.getBoost()
+	  field.setValue(newValues, boost)
 	}
       }
     }
-    
-    super.processAdd(cmd);
+    super.processAdd(cmd)
   }
-
 }
