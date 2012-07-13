@@ -15,9 +15,7 @@
  */
 package dk.industria.solr.processors;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import java.util.regex.{Matcher, Pattern, PatternSyntaxException}
 
 /**
  * Represents a pattern replace rule for the PatternReplaceProcessor .
@@ -56,7 +54,6 @@ class PatternReplaceRule(id: String, pattern: Pattern, replacement: String) {
    *
    * @return String representation of the pattern replace rule.
    */
-  @Override
   override def toString(): String = {
     val s = new StringBuilder()
     s.append("Id: [")
