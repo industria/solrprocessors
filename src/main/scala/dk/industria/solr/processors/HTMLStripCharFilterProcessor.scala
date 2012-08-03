@@ -99,7 +99,7 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
       var nCharsRead = filter.read(buffer)
       while (-1 != nCharsRead) {
         if (0 < nCharsRead) {
-          stripped.append(buffer, 0, nCharsRead)
+          stripped.appendAll(buffer, 0, nCharsRead)
         }
         nCharsRead = filter.read(buffer)
       }
