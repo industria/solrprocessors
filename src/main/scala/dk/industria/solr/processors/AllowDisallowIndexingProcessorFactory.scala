@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dk.industria.solr.processors;
+package dk.industria.solr.processors
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
+import org.apache.solr.common.util.NamedList
 
-import org.apache.solr.core.SolrCore;
-import org.apache.solr.schema.{IndexSchema, SchemaField}
-
-import org.apache.solr.common.util.NamedList;
-
-import org.apache.solr.request.SolrQueryRequest;
-import org.apache.solr.response.SolrQueryResponse;
+import org.apache.solr.request.SolrQueryRequest
+import org.apache.solr.response.SolrQueryResponse
 
 import org.apache.solr.update.processor.{UpdateRequestProcessor, UpdateRequestProcessorFactory}
 
-import org.slf4j.LoggerFactory;
-
-import scala.collection.JavaConverters._
+import org.slf4j.LoggerFactory
 
 /**
  * Implements a factory for the AllowDisallowIndexingProcessor
@@ -61,21 +51,16 @@ import scala.collection.JavaConverters._
  * </pre>
  */
 class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactory {
-  /**
-   * Logger
-   */
+  /** Logger */
   private val logger = LoggerFactory.getLogger(getClass)
-  /**
-   * Mode configured
-   */
-  private var mode = AllowDisallowMode.Unknown
-  /**
-   * List of field match rules configured.
-   */
+
+  /** Mode configured */
+  private var _mode = AllowDisallowMode.Unknown
+
+  /** List of field match rules configured. */
   private var _rules: List[FieldMatchRule] = Nil
 
-  /**
-   * Get the NamedList associated with a key.
+  /** Get the NamedList associated with a key.
    *
    * @param args The NamedList to look for the key.
    * @param key  The key to look for in the list.
@@ -85,8 +70,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
     Option(args.get(key)).filter(_.isInstanceOf[NamedList[_]]).map(_.asInstanceOf[NamedList[_]])
   }
 
-  /**
-   * Converts the raw NamedList field match configuration to a list of FieldMatchRule.
+  /** Converts the raw NamedList field match configuration to a list of FieldMatchRule.
    *
    * @param configuration The NamedList of allow/disallow lst element (solrconfig.xml).
    * @return List of FieldMatchRule items.
@@ -123,8 +107,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
     return rules.reverse
   }
 
-  /**
-   * Get the name of the unique key defined for the schema.
+  /** Get the name of the unique key defined for the schema.
    *
    * @param request SolrQueryRequest
    * @return Option String containing the name of the schema unique key.
@@ -137,30 +120,19 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
     Option(schema.getUniqueKeyField()).map(_.getName())
   }
 
-  /**
-   * Get the configured mode of operation.
+  /** Get the configured mode of operation.
    *
    * @return Mode of operation as a AllowDisallowMode enum.
    */
-  def getMode(): AllowDisallowMode.Value = mode
+  def mode: AllowDisallowMode.Value = _mode
 
-  /**
-   * Get the list of field match rules configured.
-   * This is for access from the Java based test cases.
-   *
-   * @return Unmodifiable list of rules.
-   */
-  def getRules(): java.util.List[FieldMatchRule] = Collections.unmodifiableList(_rules.asJava)
-
-  /**
-   * Get the list of field match rules configured.
+  /** Get the list of field match rules configured.
    *
    * @return List of rules.
    */
   def rules: List[FieldMatchRule] = _rules
   
-  /**
-   * Init called by Solr processor chain
+  /** Init called by Solr processor chain
    *
    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
    */
@@ -168,23 +140,22 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
     val allow = getConfiguredList(args, "allow")
     if (allow.isDefined) {
       logger.debug("Running with allow semantics: {}", allow.get)
-      this.mode = AllowDisallowMode.Allow
+      _mode = AllowDisallowMode.Allow
       _rules = getFieldMatchRules(allow.get)
     } else {
       val disallow = getConfiguredList(args, "disallow")
       if (disallow.isDefined) {
         logger.debug("Running with disallow semantics: {}", disallow.get)
-        this.mode = AllowDisallowMode.Disallow
+        _mode = AllowDisallowMode.Disallow
 	_rules = getFieldMatchRules(disallow.get)
       } else {
         logger.warn("No rules configured for the processor. Consider removing it from chain.")
-        this.mode = AllowDisallowMode.Unknown;
+        _mode = AllowDisallowMode.Unknown;
       }
     }
   }
 
-  /**
-   * Factory method for the AllowDisallowIndexingProcessor called by Solr processor chain.
+  /** Factory method for the AllowDisallowIndexingProcessor called by Solr processor chain.
    *
    * @param solrQueryRequest SolrQueryRequest
    * @param solrQueryResponse SolrQueryResponse
@@ -193,6 +164,6 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    */
   override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse, updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
     val uniqueKeyField = uniqueKey(solrQueryRequest)
-    new AllowDisallowIndexingProcessor(this.mode, _rules, uniqueKeyField, updateRequestProcessor)
+    new AllowDisallowIndexingProcessor(_mode, _rules, uniqueKeyField, updateRequestProcessor)
   }
 }
