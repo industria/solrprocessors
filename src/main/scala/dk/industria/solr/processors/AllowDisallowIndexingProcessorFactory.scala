@@ -104,7 +104,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
       }
     }
     logger.info("Rules configured: {}", rules)
-    return rules.reverse
+    rules.reverse
   }
 
   /** Get the name of the unique key defined for the schema.
