@@ -15,8 +15,6 @@
  */
 package dk.industria.solr.processors
 
-import java.util.Collections
-
 import org.apache.solr.common.util.NamedList
 
 import org.apache.solr.request.SolrQueryRequest
@@ -53,21 +51,16 @@ import scala.collection.JavaConverters._
  * </pre>
  */
 class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory {
-  /**
-   * Logger
-   */
+  /** Logger */
   private val logger = LoggerFactory.getLogger(getClass())
-  /**
-   * List of fields configured for HTML character stripping.
-   */
+
+  /** List of fields configured for HTML character stripping. */
   private var fieldsToProcess: List[String] = Nil
-  /**
-   * Indicates if spaces should be normalized after running HTMLStripCharFilter.
-   */
+
+  /** Indicates if spaces should be normalized after running HTMLStripCharFilter. */
   private var spaceNormalize = true
   
-  /**
-   * Generate a string containing the fields configured, the string is
+  /** Generate a string containing the fields configured, the string is
    * on the form {field1} {field2} ... {fieldN}
    *
    * @param fields The fields for the field string.
@@ -75,26 +68,22 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    */
   private def configuredFieldsString(fields: List[String]): String = {
     val s = new StringBuilder(256)
-    fields.foreach( { s.append(" {").append(_).append("}") } )
+    fields foreach { s.append(" {").append(_).append("}") } 
     s.toString()
   }
 
-  /**
-   * Extract field names from init arguments.
+  /** Extract field names from init arguments.
    * That is fields with a key of field and a type of String.
    *
    * @param initArguments NamedList containing the init arguments.
    * @return List of field names.
    */
   private def extractFields(initArguments: NamedList[_]): List[String] = {
-    val valuesWithField = initArguments.getAll("field").asScala.toList
-    val stringInstanceFields = valuesWithField.filter( { _.isInstanceOf[String] } )
-    val stringFields = stringInstanceFields.map( { _.asInstanceOf[String].trim }  )
-    stringFields.filter( { 0 < _.length } )
+    val fields = initArguments.getAll("field").asScala.toList
+    fields filter { _.isInstanceOf[String] } map { _.asInstanceOf[String].trim } filter { 0 < _.length }
   }
 
-  /**
-   * Extract space normalization setting from boolean with key normalize.
+  /** Extract space normalization setting from boolean with key normalize.
    * <p/>
    * If a bool element with normalize name attribute does not exists in
    * the arguments it will default to true.
@@ -106,23 +95,20 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
     Option(args.get("normalize")).filter(_.isInstanceOf[Boolean]).map(_.asInstanceOf[Boolean]).getOrElse(true)
   }
 
-  /**
-   * Get the list of field names configured for processing.
+  /** Get the list of field names configured for processing.
    * Used for Java test cases.
    *
-   * @return Unmodifiable list of field names configured.
+   * @return List of field names configured.
    */
-  def getFields(): java.util.List[String] = Collections.unmodifiableList(fieldsToProcess.asJava)
+  def fields: List[String] = fieldsToProcess
 
-  /**
-   * Get space normalization setting.
+  /** Get space normalization setting.
    *
    * @return True is space normalization should be performed in the processor.
    */
-  def getNormalize(): Boolean = spaceNormalize
+  def normalize: Boolean = spaceNormalize
   
-  /**
-   * Init called by Solr processor chain
+  /** Init called by Solr processor chain
    * The values configured for name attribute field are extracted to fieldsToProcess.
    *
    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
@@ -139,15 +125,12 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
     }
   }
 
-  /**
-   * Factory method for the HTMLStripCharFilterProcessor called by SOLR processor chain.
+  /** Factory method for the HTMLStripCharFilterProcessor called by SOLR processor chain.
    *
    * @param solrQueryRequest SolrQueryRequest
    * @param solrQueryResponse SolrQueryResponse
    * @param updateRequestProcessor UpdateRequestProcessor
    * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
    */
-  override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse , updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
-    new HTMLStripCharFilterProcessor(fieldsToProcess, spaceNormalize, updateRequestProcessor)
-  }
+  override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse , updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = new HTMLStripCharFilterProcessor(fieldsToProcess, spaceNormalize, updateRequestProcessor)
 }
