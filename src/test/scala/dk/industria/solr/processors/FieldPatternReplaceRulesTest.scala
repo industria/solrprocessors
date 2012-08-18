@@ -17,30 +17,22 @@ package dk.industria.solr.processors
 
 import org.scalatest.FunSuite
 
-/**
- * Implements tests for the FieldPatternReplaceRules
- */
+/** Implements tests for the FieldPatternReplaceRules */
 class FieldPatternReplaceRulesTest extends FunSuite {
-  /**
-   * Testing for exception when trying construction with null as field name.
-   */
+  /** Testing for exception when trying construction with null as field name. */
   test("Create with null argument") {
     intercept[IllegalArgumentException] { new FieldPatternReplaceRules(null) }
   }
 
-  /**
-   * Testing normal construction.
-   */
+  /** Testing normal construction. */
   test("Create card") {
     expect("card") { 
       val fieldRules = new FieldPatternReplaceRules("card")
-      fieldRules.getFieldName() 
+      fieldRules.fieldName 
     }
   }
 
-  /**
-   * Testing for exception when trying construction with null as field name.
-   */
+  /** Testing for exception when trying construction with null as field name. */
   test("Add null rule") {
     intercept[IllegalArgumentException] {
       val rules = new FieldPatternReplaceRules("card")
@@ -48,9 +40,8 @@ class FieldPatternReplaceRulesTest extends FunSuite {
     }
   }
 
-  /**
-   * Create a FieldPatternReplaceRules containing two rules.
-   *
+  /** Create a FieldPatternReplaceRules containing two rules.
+   * 
    * @return FieldPatternReplaceRules
    */
   private def createRules(): FieldPatternReplaceRules =  {
@@ -60,9 +51,7 @@ class FieldPatternReplaceRulesTest extends FunSuite {
     return rules
   }
 
-  /**
-   * Test the replace method
-   */
+  /** Test the replace method */
   test("Replace test") {
     expect("xxxx-3333-3333-1111") { 
       val rules = createRules()
@@ -70,9 +59,7 @@ class FieldPatternReplaceRulesTest extends FunSuite {
     }
   }
 
-  /**
-   * Testing calling replace with a null value.
-   */
+  /** Testing calling replace with a null value. */
   test("Replace with null argument") {
     intercept[IllegalArgumentException] {
       val rules = createRules()

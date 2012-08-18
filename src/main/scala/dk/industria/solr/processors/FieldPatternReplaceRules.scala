@@ -15,32 +15,24 @@
  */
 package dk.industria.solr.processors
 
-import scala.collection.JavaConverters._
-
 /**
  * Implements a field with a list of pattern replace rules attached..
  * @param fieldName Name of the fields the rules should be attached to.
  */
-class FieldPatternReplaceRules(fieldName: String) {
+class FieldPatternReplaceRules(val fieldName: String) {
   require(null != fieldName)
   /**
    * List of pattern replace rules attached to the field.
    * @see PatternReplaceRule
    */
-  var rules: List[PatternReplaceRule] = Nil
-
-    /**
-     * Get the field name .
-     * @return Field name.
-     */
-  def getFieldName(): String = fieldName
+  private var _rules: List[PatternReplaceRule] = Nil
 
   /**
    * Get pattern replace rules attached to the field.
    *
    * @return List of pattern replace rules for the field.
    */
-  def getRules(): java.util.List[PatternReplaceRule] = rules.asJava 
+  def rules: List[PatternReplaceRule] = _rules
 
   /**
    * Add a pattern replace rule to the field.
@@ -50,8 +42,8 @@ class FieldPatternReplaceRules(fieldName: String) {
    */
   def add(rule: PatternReplaceRule) = {
     require(null != rule)
-    val ruleList = rule :: rules
-    rules = ruleList.reverse
+    val ruleList = rule :: _rules
+    _rules = ruleList.reverse
   }
 
   /**
@@ -63,6 +55,6 @@ class FieldPatternReplaceRules(fieldName: String) {
    */
   def replace(value: String): String = {
     require(null != value)
-    (value /: rules)((v, rule) => rule.replace(v))
+    (value /: _rules)((v, rule) => rule.replace(v))
   }
 }

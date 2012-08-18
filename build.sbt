@@ -18,10 +18,6 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.6.1" % "test"
 
 libraryDependencies += "org.slf4j" % "slf4j-jdk14" % "1.6.3" % "test"
 
-libraryDependencies += "com.novocode" % "junit-interface" % "0.8" % "test"
-
-libraryDependencies += "junit" % "junit" % "4.10" % "test"
-
 pomExtra := <xml:group>
   <name>solrprocessors</name>
   <description>Solr processors for use in the update request processor chain.</description>

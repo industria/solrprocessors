@@ -18,23 +18,17 @@ package dk.industria.solr.processors
 /**
  * Represents a rule for matching field values
  * <p>Used by the @see AllowDisallowIndexingProcessor.</p>.
- * @param fieldToMatch Name of the field to match the pattern against.
+ * @param field Name of the field to match the pattern against.
  * @param patternToMatch Regular expression to match against the field.
  */
-class FieldMatchRule(fieldToMatch: String, patternToMatch: String) {
-  require(null != fieldToMatch)
+class FieldMatchRule(val field: String, patternToMatch: String) {
+  require(null != field)
   require(null != patternToMatch)
   
   /**
    * Pattern to match against the field.
    */
   private val _pattern = patternToMatch.r
-
-  /**
-   * Get the field name of the match rule.
-   * @return Field name of the match field.
-   */ 
-  def field = fieldToMatch
 
   /**
    * Matches the field value against the pattern.
@@ -54,7 +48,7 @@ class FieldMatchRule(fieldToMatch: String, patternToMatch: String) {
    */
   override def toString = {
     val s = new StringBuilder(128)
-    s.append(fieldToMatch)
+    s.append(field)
     s.append(" =~ m/")
     s.append(_pattern)
     s.append("/")

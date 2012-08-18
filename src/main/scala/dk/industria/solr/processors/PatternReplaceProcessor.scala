@@ -46,7 +46,7 @@ class PatternReplaceProcessor(fieldPatternRules: List[FieldPatternReplaceRules],
     val document = cmd.getSolrInputDocument()
     
     for(fieldRules <- this.fieldPatternRules) {
-      val fieldName = fieldRules.getFieldName()
+      val fieldName = fieldRules.fieldName
       logger.debug("Processing field: {}", fieldName)
       
       val field = document.getField(fieldName)

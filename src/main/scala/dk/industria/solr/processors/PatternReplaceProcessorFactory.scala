@@ -26,8 +26,7 @@ import scala.collection.immutable.HashMap
 
 import scala.collection.JavaConverters._
 
-/**
- * Implements a factory for the PatternReplaceProcessor used by the Solr update request processor chain.
+/** Implements a factory for the PatternReplaceProcessor used by the Solr update request processor chain.
  * <p/>
  * The primary purpose, in addition to acting as a factory, is parsing the configuration placed
  * within the processor element in solrconfig.xml.
@@ -75,16 +74,13 @@ import scala.collection.JavaConverters._
  * </pre>
  */
 class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
-  /**
-   * Logger
-   */
+  /** Logger */
   private val logger = LoggerFactory.getLogger(getClass())
-  /**
-   * Field pattern rules configured.
-   */
+
+  /** Field pattern rules configured. */
   private var fieldPatternRules: List[FieldPatternReplaceRules] = Nil
-  /**
-   * Get a String element from a NamedList.
+
+  /** Get a String element from a NamedList.
    *
    * @param args NamedList to get the String from.
    * @param name String containing the name of the name attribute to retrieve.
@@ -94,8 +90,7 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
     Option(args.get(name)).filter(_.isInstanceOf[String]).map(_.asInstanceOf[String])
   }
 
-  /**
-   * Extract pattern replace rules from the processor chain arguments.
+  /** Extract pattern replace rules from the processor chain arguments.
    *
    * A rule needs to be a NamedList type entry with name attribute set to rule
    * and containing three String type entries with name attribute set to
@@ -135,8 +130,7 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
     rules
   }
 
-  /**
-   * Extract field pattern replace rules..
+  /** Extract field pattern replace rules..
    *
    * @param args NamedList with arguments as passed by the processor chain.
    * @return List of field pattern replace rules.
@@ -178,35 +172,30 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
     fieldPatternRules.values.toList
   }
 
-  /**
-   * Get collection of field pattern replace rules.
+  /** Get collection of field pattern replace rules.
    * Used by the Java based test cases.
    *
    * @return Unmodifiable collection of pattern replace rules.
    */
-  def getFieldRules(): java.util.Collection[FieldPatternReplaceRules] = java.util.Collections.unmodifiableCollection(this.fieldPatternRules.asJava)
+  def fieldRules: List[FieldPatternReplaceRules] = this.fieldPatternRules
 
-  /**
-   * Init called by Solr processor chain.
+  /** Init called by Solr processor chain.
    *
    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
    */
   override def init(args: NamedList[_]) = {
     fieldPatternRules = extractFieldRuleMappings(args)
     if(logger.isInfoEnabled()) {
-      fieldPatternRules.foreach((rule) => logger.info("Field [{}] configured with rule {}", rule.getFieldName(), rule)   )
+      fieldPatternRules.foreach((rule) => logger.info("Field [{}] configured with rule {}", rule.fieldName, rule)   )
     }
   }
   
-  /**
-   * Factory method for the PatternReplaceProcessor called by Solr processor chain.
+  /** Factory method for the PatternReplaceProcessor called by Solr processor chain.
    *
    * @param solrQueryRequest SolrQueryRequest
    * @param solrQueryResponse SolrQueryResponse
    * @param updateRequestProcessor UpdateRequestProcessor
    * @return Instance of PatternReplaceProcessor configured with field list and rule mapping.
    */
-  override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse, updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
-    new PatternReplaceProcessor(fieldPatternRules, updateRequestProcessor);
-  }
+  override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse, updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = new PatternReplaceProcessor(fieldPatternRules, updateRequestProcessor)
 }
