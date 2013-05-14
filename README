@@ -12,7 +12,7 @@ Installation
    and place the jar-file in that folder. Solr will add the files in that folder to
    the classpath on startup.
 
-3) Make sure you have scala-library-2.9.2.jar in the classpath
+3) Make sure you have scala-library-2.10.0 in the classpath
    You can place it in the lib folder as described above if you don't have it
    available in the classpath of the container already.
 
