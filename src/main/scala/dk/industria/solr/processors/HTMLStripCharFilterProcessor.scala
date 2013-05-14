@@ -20,10 +20,7 @@ import java.util.{ArrayList, Collection}
 
 import org.slf4j.LoggerFactory;
 
-//import org.apache.lucene.analysis.{CharReader, CharStream}
-
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter
-//import org.apache.solr.analysis.HTMLStripCharFilter
 
 import org.apache.solr.common.{SolrInputDocument, SolrInputField}
 
@@ -94,7 +91,6 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
         r = new BufferedReader(r)
       }
       
-//      val cs: CharStream = CharReader.get(r)
       val filter = new HTMLStripCharFilter(r)
 
       var nCharsRead = filter.read(buffer)

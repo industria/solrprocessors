@@ -69,7 +69,7 @@ class PatternReplaceRuleTest extends FunSuite {
    * Test the string representation
    */
   test("To string test") {
-    expect("Id: [id] Pattern: [(\\d+)] Replace: [?]") {
+    expectResult("Id: [id] Pattern: [(\\d+)] Replace: [?]") {
       val r = PatternReplaceRule.getInstance("id", "(\\d+)", "?")
       r.toString()
     }
@@ -79,7 +79,7 @@ class PatternReplaceRuleTest extends FunSuite {
    * Testing replace with a match
    */
   test("Replace test") {
-    expect("1111-2222-3333-xxxx") {
+    expectResult("1111-2222-3333-xxxx") {
       val r = PatternReplaceRule.getInstance("id", "\\d{4}$", "xxxx")
       r.replace("1111-2222-3333-4444")
     }
@@ -89,7 +89,7 @@ class PatternReplaceRuleTest extends FunSuite {
    * Testing replace with a non matching pattern
    */
   test("Replace with non matching pattern") {
-    expect("1111-2222-3333-4444") {
+    expectResult("1111-2222-3333-4444") {
       val r = PatternReplaceRule.getInstance("id", "\\d{6}$", "xxxx")
       r.replace("1111-2222-3333-4444")
     }

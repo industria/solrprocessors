@@ -26,6 +26,8 @@ import scala.collection.immutable.HashMap
 
 import scala.collection.JavaConverters._
 
+import scala.language.existentials
+
 /** Implements a factory for the PatternReplaceProcessor used by the Solr update request processor chain.
  * <p/>
  * The primary purpose, in addition to acting as a factory, is parsing the configuration placed
@@ -142,9 +144,9 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
     
     val fieldsElement = Option(args.get("fields")).filter(_.isInstanceOf[NamedList[_]]).map(_.asInstanceOf[NamedList[_]])
     if (fieldsElement.isDefined) {
-      val itr = fieldsElement.get.iterator()
-      while (itr.hasNext()) {
-        val kv = itr.next()
+      val itr = fieldsElement.get.iterator().asScala
+      while (itr.hasNext) {
+        val kv = itr.next
         if(kv.getValue().isInstanceOf[String]) {
           val fieldName = kv.getKey()
 	  val ruleId = kv.getValue().asInstanceOf[String]

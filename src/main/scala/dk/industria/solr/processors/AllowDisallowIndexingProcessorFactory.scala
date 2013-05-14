@@ -24,6 +24,9 @@ import org.apache.solr.update.processor.{UpdateRequestProcessor, UpdateRequestPr
 
 import org.slf4j.LoggerFactory
 
+import scala.collection.JavaConverters._
+
+import scala.language.existentials
 /**
  * Implements a factory for the AllowDisallowIndexingProcessor
  * <p/>
@@ -77,9 +80,9 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    */
   private def getFieldMatchRules(configuration: NamedList[_]): List[FieldMatchRule] = {
     var rules: List[FieldMatchRule] = Nil
-    val itr = configuration.iterator()
-    while (itr.hasNext()) {
-      val kv = itr.next()
+    val itr = configuration.iterator().asScala
+    while (itr.hasNext) {
+      val kv = itr.next
       val key = kv.getKey()
       if ((null == key) || (0 == key.trim().length())) {
         logger.warn("Item missing name attribute: {}", kv)

@@ -66,7 +66,7 @@ class FieldMatchRuleTest extends FunSuite {
    * Testing toString format.
    */
   test("To string format") {
-    expect("field =~ m/matchPattern/") {
+    expectResult("field =~ m/matchPattern/") {
       val fmr = new FieldMatchRule("field", "matchPattern")
       fmr.toString()
     }

@@ -1,6 +1,6 @@
 name := "solrprocessors"
 
-version := "2.0"
+version := "4.3"
 
 description := "Solr processors for use in the update request processor chain."
 
@@ -8,13 +8,15 @@ organization := "dk.industria.solr.processors"
 
 scalacOptions += "-deprecation"
 
-scalaVersion := "2.9.2"
+scalacOptions += "-feature"
+
+scalaVersion := "2.10.0"
 
 libraryDependencies += "org.apache.solr" % "solr-core" % "4.3.0" % "compile"
 
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.6.1" % "compile"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "1.6.1" % "test"
+libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test"
 
 libraryDependencies += "org.slf4j" % "slf4j-jdk14" % "1.6.3" % "test"
 
