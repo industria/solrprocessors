@@ -110,15 +110,14 @@ class HTMLStripCharFilterProcessorTest extends FunSuite {
   test("markupNoneHeaderInContent") {
     val processor = headerContentProcessor(true)
 
-    val cmd = new AddUpdateCommand()
+    val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocumentWithMarkup()
 
     processor.processAdd(cmd)
 
-    val actualHeader = cmd.solrDoc.getFieldValue("header").asInstanceOf[String]
-    assert(actualHeader.equals("Header without markup"))
-    val actualContent = cmd.solrDoc.getFieldValue("content").asInstanceOf[String]
-    assert(actualContent.equals("Content with markup"))
+    expect("Header without markup") { cmd.solrDoc.getFieldValue("header").asInstanceOf[String] }
+
+    expect("Content with markup") { cmd.solrDoc.getFieldValue("content").asInstanceOf[String] }
   }
 
   /** Process a document where header doesn't contain any markup but the content does
@@ -126,7 +125,7 @@ class HTMLStripCharFilterProcessorTest extends FunSuite {
    */
   test("markupNoneHeaderInContentMultivalued") {
     val processor = headerContentProcessor(true)
-    val cmd = new AddUpdateCommand()
+    val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocumentWithMarkupMultipleValue()
 
     processor.processAdd(cmd)
@@ -148,7 +147,7 @@ class HTMLStripCharFilterProcessorTest extends FunSuite {
   test("markupNoneHeaderInContentMultivaluedNoBreak") {
     val processor = headerContentProcessor(true)
 
-    val cmd = new AddUpdateCommand()
+    val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocumentWithMarkupMultipleValueNoBreakSpaces()
 
     processor.processAdd(cmd);
@@ -172,15 +171,14 @@ class HTMLStripCharFilterProcessorTest extends FunSuite {
   test("markupNoneHeaderInContentNoNormalization") {
     val processor = headerContentProcessor(false)
 
-    val cmd = new AddUpdateCommand()
+    val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocumentWithMarkup()
 
     processor.processAdd(cmd);
 
-    val actualHeader = cmd.solrDoc.getFieldValue("header").asInstanceOf[String]
-    assert("Header without markup".equals(actualHeader))
-    val actualContent = cmd.solrDoc.getFieldValue("content").asInstanceOf[String]
-    assert(" Content   with  markup".equals(actualContent))
+    expect("Header without markup") { cmd.solrDoc.getFieldValue("header").asInstanceOf[String] }
+
+    expect("\nContent\n with markup") { cmd.solrDoc.getFieldValue("content").asInstanceOf[String] }
   }
 
 }

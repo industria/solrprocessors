@@ -99,7 +99,7 @@ class PatternReplaceProcessorTest extends FunSuite {
     factory.init(createConfig())
     val processor = factory.getInstance(null, null, null)
     
-    val cmd = new AddUpdateCommand()
+    val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocumentWithCardField()
     
     processor.processAdd(cmd);

@@ -84,7 +84,7 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
    * Allow mode field with a match and thereby catching a pass in the recorder
    */
   test("Document allow match") {
-    val cmd = new AddUpdateCommand()
+    val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocument("default")
     val passRecorder = new AllowDisallowIndexingProcessorNext(null)
     val processor = getProcessor(createDefaultNewsConfig("allow"), passRecorder)
@@ -96,7 +96,7 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
    * Allow mode field without a match and thereby not catching a pass in the recorder
    */
   test("Document allow with no match") {
-    val cmd = new AddUpdateCommand()
+    val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocument("person")
     val passRecorder = new AllowDisallowIndexingProcessorNext(null)
     val processor = getProcessor(createDefaultNewsConfig("allow"), passRecorder)
@@ -108,7 +108,7 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
    * Disallow mode field with a match and thereby not catching a pass in the recorder
    */
   test("Document disallow match") {
-    val cmd = new AddUpdateCommand()
+    val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocument("default")
     val passRecorder = new AllowDisallowIndexingProcessorNext(null)
     val processor = getProcessor(createDefaultNewsConfig("disallow"), passRecorder)
@@ -120,7 +120,7 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
    * Disallow mode field without a match and thereby catching a pass in the recorder
    */
   test("Document disallow with no match") {
-    val cmd = new AddUpdateCommand()
+    val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocument("person")
     val passRecorder = new AllowDisallowIndexingProcessorNext(null)
     val processor = getProcessor(createDefaultNewsConfig("disallow"), passRecorder)
