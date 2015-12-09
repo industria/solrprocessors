@@ -115,9 +115,9 @@ class HTMLStripCharFilterProcessorTest extends FunSuite {
 
     processor.processAdd(cmd)
 
-    expectResult("Header without markup") { cmd.solrDoc.getFieldValue("header").asInstanceOf[String] }
+    assertResult("Header without markup") { cmd.solrDoc.getFieldValue("header").asInstanceOf[String] }
 
-    expectResult("Content with markup") { cmd.solrDoc.getFieldValue("content").asInstanceOf[String] }
+    assertResult("Content with markup") { cmd.solrDoc.getFieldValue("content").asInstanceOf[String] }
   }
 
   /** Process a document where header doesn't contain any markup but the content does
@@ -176,9 +176,9 @@ class HTMLStripCharFilterProcessorTest extends FunSuite {
 
     processor.processAdd(cmd);
 
-    expectResult("Header without markup") { cmd.solrDoc.getFieldValue("header").asInstanceOf[String] }
+    assertResult("Header without markup") { cmd.solrDoc.getFieldValue("header").asInstanceOf[String] }
 
-    expectResult("\nContent\n with markup") { cmd.solrDoc.getFieldValue("content").asInstanceOf[String] }
+    assertResult("\nContent\n with markup") { cmd.solrDoc.getFieldValue("content").asInstanceOf[String] }
   }
 
 }

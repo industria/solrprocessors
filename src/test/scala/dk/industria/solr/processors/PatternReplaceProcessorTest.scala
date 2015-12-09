@@ -103,10 +103,10 @@ class PatternReplaceProcessorTest extends FunSuite {
     cmd.solrDoc = createDocumentWithCardField()
     
     processor.processAdd(cmd);
-    expectResult("Header without markup") { cmd.solrDoc.getFieldValue("header") }
-    expectResult("Content with markup") { cmd.solrDoc.getFieldValue("content") }
-    expectResult("****-1111-2222-3333") { cmd.solrDoc.getFieldValue("card") }
-    expectResult("There is punctuation") { cmd.solrDoc.getFieldValue("comment") }
-    expectResult("****111122223333") { cmd.solrDoc.getFieldValue("clean") }
+    assertResult("Header without markup") { cmd.solrDoc.getFieldValue("header") }
+    assertResult("Content with markup") { cmd.solrDoc.getFieldValue("content") }
+    assertResult("****-1111-2222-3333") { cmd.solrDoc.getFieldValue("card") }
+    assertResult("There is punctuation") { cmd.solrDoc.getFieldValue("comment") }
+    assertResult("****111122223333") { cmd.solrDoc.getFieldValue("clean") }
   }
 }

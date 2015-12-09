@@ -14,7 +14,7 @@ libraryDependencies += "org.apache.solr" % "solr-core" % "4.6.0" % "compile"
 
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.6.1" % "compile"
 
-libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test"
+libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
 
 libraryDependencies += "org.slf4j" % "slf4j-jdk14" % "1.6.3" % "test"
 

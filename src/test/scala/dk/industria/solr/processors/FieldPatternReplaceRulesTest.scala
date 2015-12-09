@@ -26,7 +26,7 @@ class FieldPatternReplaceRulesTest extends FunSuite {
 
   /** Testing normal construction. */
   test("Create card") {
-    expectResult("card") { 
+    assertResult("card") { 
       val fieldRules = new FieldPatternReplaceRules("card")
       fieldRules.fieldName 
     }
@@ -53,7 +53,7 @@ class FieldPatternReplaceRulesTest extends FunSuite {
 
   /** Test the replace method */
   test("Replace test") {
-    expectResult("xxxx-3333-3333-1111") { 
+    assertResult("xxxx-3333-3333-1111") { 
       val rules = createRules()
       rules.replace("4444*3333*3333*1111")
     }
