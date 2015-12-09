@@ -126,7 +126,7 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
 	  }
 	}
       } catch { 
-	case e: IllegalArgumentException => logger.warn("Unable to create rule for {}, error was {}", ruleElement, e.getMessage())
+	case e: IllegalArgumentException => logger.warn("Unable to create rule for {}, error was {}", ruleElement:Any, e.getMessage():Any)
       }
     }
     rules
@@ -188,7 +188,7 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
   override def init(args: NamedList[_]) = {
     fieldPatternRules = extractFieldRuleMappings(args)
     if(logger.isInfoEnabled()) {
-      fieldPatternRules.foreach((rule) => logger.info("Field [{}] configured with rule {}", rule.fieldName, rule)   )
+      fieldPatternRules.foreach((rule) => logger.info("Field [{}] configured with rule {}", rule.fieldName:Any, rule:Any) )
     }
   }
   

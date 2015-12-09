@@ -63,7 +63,7 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
 	      val sv = v.asInstanceOf[String]
 	      val ruleMatches = rule.matches(sv)
 	      if (ruleMatches) {
-		logger.debug("Matched rule [{}] on value [{}]", rule, sv)
+		logger.debug("Matched rule [{}] on value [{}]", rule:Any, sv:Any)
 	      }
 	      ruleMatches
 	    } else {
