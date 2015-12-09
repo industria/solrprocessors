@@ -6,7 +6,7 @@ description := "Solr processors for use in the update request processor chain."
 
 organization := "dk.industria.solr.processors"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.11.7"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-optimise", "-feature", "-Xlint", "-language:postfixOps")
 
