@@ -132,5 +132,9 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    * @param updateRequestProcessor UpdateRequestProcessor
    * @return Instance of HTMLStripCharFilterProcessor initialized with the fields to process.
    */
-  override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse , updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = new HTMLStripCharFilterProcessor(fieldsToProcess, spaceNormalize, updateRequestProcessor)
+  override def getInstance(solrQueryRequest: SolrQueryRequest,
+                           solrQueryResponse: SolrQueryResponse,
+                           updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
+    new HTMLStripCharFilterProcessor(fieldsToProcess, spaceNormalize, updateRequestProcessor)
+  }
 }
