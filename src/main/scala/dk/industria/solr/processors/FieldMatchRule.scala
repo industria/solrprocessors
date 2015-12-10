@@ -36,10 +36,7 @@ class FieldMatchRule(val field: String, patternToMatch: String) {
    * @return True if the pattern matches the field value.
    */
   def matches(fieldValue: String): Boolean = {
-    if(null == fieldValue) return false;
-
-    val m = _pattern.findFirstMatchIn(fieldValue)
-    m.isDefined
+    (null != fieldValue) && _pattern.findFirstMatchIn(fieldValue).isDefined
   }
 
   /**
