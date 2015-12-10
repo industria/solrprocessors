@@ -36,7 +36,10 @@ import scala.collection.JavaConverters._
  * @param uniqueKey Name of the document unique key. Null is no unique key is defined in the schema.
  * @param next      Next UpdateRequestProcessor in the processor chain.
  */
-class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[FieldMatchRule], uniqueKey: Option[String], next: UpdateRequestProcessor) extends UpdateRequestProcessor(next) {
+class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value,
+                                     rules: List[FieldMatchRule],
+                                     uniqueKey: Option[String],
+                                     next: UpdateRequestProcessor) extends UpdateRequestProcessor(next) {
   /**
    * Logger
    * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
