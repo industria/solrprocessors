@@ -199,5 +199,9 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    * @param updateRequestProcessor UpdateRequestProcessor
    * @return Instance of PatternReplaceProcessor configured with field list and rule mapping.
    */
-  override def getInstance(solrQueryRequest: SolrQueryRequest, solrQueryResponse: SolrQueryResponse, updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = new PatternReplaceProcessor(fieldPatternRules, updateRequestProcessor)
+  override def getInstance(solrQueryRequest: SolrQueryRequest,
+                           solrQueryResponse: SolrQueryResponse,
+                           updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
+    new PatternReplaceProcessor(fieldPatternRules, updateRequestProcessor)
+  }
 }
