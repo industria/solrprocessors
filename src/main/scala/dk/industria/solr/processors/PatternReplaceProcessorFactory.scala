@@ -185,7 +185,7 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    *
    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
    */
-  override def init(args: NamedList[_]) = {
+  override def init(args: NamedList[_]): Unit = {
     fieldPatternRules = extractFieldRuleMappings(args)
     if(logger.isInfoEnabled()) {
       fieldPatternRules.foreach((rule) => logger.info("Field [{}] configured with rule {}", rule.fieldName:Any, rule:Any) )

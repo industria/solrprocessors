@@ -46,7 +46,7 @@ class FieldMatchRule(val field: String, patternToMatch: String) {
    * Returns a String representation of the field match rule.
    * @return String representing the rule.
    */
-  override def toString = {
+  override def toString(): String = {
     val s = new StringBuilder(128)
     s.append(field)
     s.append(" =~ m/")

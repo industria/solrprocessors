@@ -97,7 +97,7 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
    * @throws IOException
    */
   @throws(classOf[IOException])
-  override def processAdd(cmd: AddUpdateCommand) = {
+  override def processAdd(cmd: AddUpdateCommand): Unit = {
     if (this.mode == AllowDisallowMode.Unknown) {
       logger.warn("Mode UNKNOWN, indexing, check configuration!")
       super.processAdd(cmd)

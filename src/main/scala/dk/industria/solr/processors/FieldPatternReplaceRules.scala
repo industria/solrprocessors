@@ -40,7 +40,7 @@ class FieldPatternReplaceRules(val fieldName: String) {
    * @param rule PatternReplaceRule to add to the field.
    * @throws IllegalArgumentException if the rule is null.
    */
-  def add(rule: PatternReplaceRule) = {
+  def add(rule: PatternReplaceRule): Unit = {
     require(null != rule)
     val ruleList = rule :: _rules
     _rules = ruleList.reverse

@@ -118,7 +118,7 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
    * @throws IOException
    */
   @throws(classOf[IOException])
-  override def processAdd(cmd: AddUpdateCommand) = {
+  override def processAdd(cmd: AddUpdateCommand): Unit = {
     val doc = cmd.getSolrInputDocument()
     for (fieldName <- this.fieldsToProcess) {
       logger.debug("Processing field: {}", fieldName)

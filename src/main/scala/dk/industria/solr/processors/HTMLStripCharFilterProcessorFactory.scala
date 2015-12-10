@@ -113,7 +113,7 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    *
    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
    */
-  override def init(args: NamedList[_]) = {
+  override def init(args: NamedList[_]): Unit = {
     spaceNormalize = extractSpaceNormalization(args)
     logger.debug("Configured with space normalization set to: {}", spaceNormalize)
 
