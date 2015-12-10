@@ -44,27 +44,27 @@ class PatternReplaceProcessor(fieldPatternRules: List[FieldPatternReplaceRules],
   @throws(classOf[IOException])
   override def processAdd(cmd: AddUpdateCommand) =  {
     val document = cmd.getSolrInputDocument()
-    
+
     for(fieldRules <- this.fieldPatternRules) {
       val fieldName = fieldRules.fieldName
       logger.debug("Processing field: {}", fieldName)
-      
+
       val field = document.getField(fieldName)
       if (null != field) {
-	val values = field.getValues()
-	if (null != values) {
-	  val newValues: Collection[Object] = new ArrayList[Object]()
-	  for (value <- values.asScala) {
+        val values = field.getValues()
+        if (null != values) {
+          val newValues: Collection[Object] = new ArrayList[Object]()
+          for (value <- values.asScala) {
             if (value.isInstanceOf[String]) {
               var newValue = fieldRules.replace(value.asInstanceOf[String])
               newValues.add(newValue);
             } else {
               newValues.add(value);
             }
-	  }
-	  val boost = field.getBoost()
-	  field.setValue(newValues, boost)
-	}
+          }
+          val boost = field.getBoost()
+          field.setValue(newValues, boost)
+        }
       }
     }
     super.processAdd(cmd)

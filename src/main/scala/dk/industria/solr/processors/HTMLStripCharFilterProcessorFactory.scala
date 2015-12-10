@@ -59,7 +59,7 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
 
   /** Indicates if spaces should be normalized after running HTMLStripCharFilter. */
   private var spaceNormalize = true
-  
+
   /** Generate a string containing the fields configured, the string is
    * on the form {field1} {field2} ... {fieldN}
    *
@@ -68,7 +68,7 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    */
   private def configuredFieldsString(fields: List[String]): String = {
     val s = new StringBuilder(256)
-    fields foreach { s.append(" {").append(_).append("}") } 
+    fields foreach { s.append(" {").append(_).append("}") }
     s.toString()
   }
 
@@ -107,7 +107,7 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    * @return True is space normalization should be performed in the processor.
    */
   def normalize: Boolean = spaceNormalize
-  
+
   /** Init called by Solr processor chain
    * The values configured for name attribute field are extracted to fieldsToProcess.
    *
@@ -116,10 +116,10 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
   override def init(args: NamedList[_]) = {
     spaceNormalize = extractSpaceNormalization(args)
     logger.debug("Configured with space normalization set to: {}", spaceNormalize)
-    
+
     fieldsToProcess = extractFields(args)
     logger.debug("Configured with fields [{}]", configuredFieldsString(fieldsToProcess))
-    
+
     if (fieldsToProcess.isEmpty) {
       logger.warn("No fields configured. Consider removing the processor.")
     }

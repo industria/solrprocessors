@@ -43,7 +43,7 @@ class PatternReplaceRule(id: String, pattern: Pattern, replacement: String) {
    */
   def replace(value: String): String = {
     require(null != value)
-    
+
     val matcher = pattern.matcher(value)
     matcher.replaceAll(replacement)
   }
@@ -82,15 +82,15 @@ object PatternReplaceRule {
     require(null != id)
     require(0 < id.length)
     require(null != pattern)
-    
+
     try {
       val compiledPattern = Pattern.compile(pattern)
       val replacementValue = Option(replacement).getOrElse("")
       new PatternReplaceRule(id, compiledPattern, replacementValue)
-    } catch{ 
+    } catch {
       case e: PatternSyntaxException => {
-	val msg = "Failed to compile pattern [" + pattern + "] for rule id [" + id + "] : " + e.getMessage()
-	throw new IllegalArgumentException(msg, e)
+        val msg = "Failed to compile pattern [" + pattern + "] for rule id [" + id + "] : " + e.getMessage()
+        throw new IllegalArgumentException(msg, e)
       }
     }
   }

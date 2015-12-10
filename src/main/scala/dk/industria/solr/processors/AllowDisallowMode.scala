@@ -34,9 +34,9 @@ object AllowDisallowMode extends Enumeration {
      */
     val Allow = Value
     /**
-     * Indicates the mode of operation is disallow. 
+     * Indicates the mode of operation is disallow.
      *
-     * In disallow mode, all documents will be indexed, 
+     * In disallow mode, all documents will be indexed,
      * except for those that matches a rule.
      */
     val Disallow = Value

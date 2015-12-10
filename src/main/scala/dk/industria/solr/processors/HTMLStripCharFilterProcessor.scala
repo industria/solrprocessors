@@ -39,7 +39,7 @@ import scala.collection.JavaConverters._
  *  replaces multiple recurring spaces with a single space.
  * <p/>
  * For more information on configuration @see HTMLStripCharFilterProcessorFactory
- * 
+ *
  * @param fieldsToProcess List of field names to process.
  * @param spaceNormalize Set to true if field values should be space normalized.
  * @param next   Next UpdateRequestProcessor in the processor chain.
@@ -84,13 +84,13 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
     val stripped = new StringBuilder(BUFFER_SIZE)
     try {
       val buffer: Array[Char] = new Array(BUFFER_SIZE)
-      
+
       var r: Reader = new StringReader(text)
       if (!r.markSupported()) {
         logger.debug("Reader returned false for mark support, wrapped in BufferedReader.")
         r = new BufferedReader(r)
       }
-      
+
       val filter = new HTMLStripCharFilter(r)
 
       var nCharsRead = filter.read(buffer)
@@ -103,8 +103,8 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
       filter.close()
     } catch {
       case e: IOException => {
-	logger.error("IOException thrown in HTMLStripCharFilter: {}", e.toString())
-	throw e
+        logger.error("IOException thrown in HTMLStripCharFilter: {}", e.toString())
+        throw e
       }
     }
     stripped.toString()
@@ -124,23 +124,23 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
       logger.debug("Processing field: {}", fieldName)
       val field = doc.getField(fieldName)
       if (null != field) {
-	val values: Collection[Object] = field.getValues()
-	if (null != values) {
-	  val newValues: Collection[Object] = new ArrayList[Object]()
-	  for (value <- values.asScala) {
+        val values: Collection[Object] = field.getValues()
+        if (null != values) {
+          val newValues: Collection[Object] = new ArrayList[Object]()
+          for (value <- values.asScala) {
             if (value.isInstanceOf[String]) {
               var newValue = runHtmlStripCharFilter(value.asInstanceOf[String])
               if(this.spaceNormalize) {
-		newValue = normalizeSpace(newValue)
+                newValue = normalizeSpace(newValue)
               }
               newValues.add(newValue)
             } else {
               newValues.add(value)
             }
-	  }
-	  val boost = field.getBoost()
-	  field.setValue(newValues, boost)
-	}
+          }
+          val boost = field.getBoost()
+          field.setValue(newValues, boost)
+        }
       }
     }
     super.processAdd(cmd)

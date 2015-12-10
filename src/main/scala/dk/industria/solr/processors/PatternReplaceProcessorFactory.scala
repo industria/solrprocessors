@@ -86,7 +86,7 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    *
    * @param args NamedList to get the String from.
    * @param name String containing the name of the name attribute to retrieve.
-   * @return Option value of the name attribute. 
+   * @return Option value of the name attribute.
    */
   private def getStringElement(args: NamedList[_], name: String): Option[String] = {
     Option(args.get(name)).filter(_.isInstanceOf[String]).map(_.asInstanceOf[String])
@@ -103,7 +103,7 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    */
   private def extractRules(args: NamedList[_]): Map[String, PatternReplaceRule] = {
     var rules: Map[String, PatternReplaceRule] = new HashMap
-    
+
     val ruleElements = args.getAll("rule").asScala.filter(_.isInstanceOf[NamedList[_]]).map(_.asInstanceOf[NamedList[_]])
     for(ruleElement <- ruleElements) {
       try {
@@ -117,16 +117,16 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
           } else {
             val replace = getStringElement(ruleElement, "replace")
             if(replace.isEmpty) {
-	      logger.warn("replace not found for rule")
+              logger.warn("replace not found for rule")
             } else {
-	      val rule = PatternReplaceRule.getInstance(id.get, pattern.get, replace.get)
-	      rules = rules.updated(id.get, rule)
-	      logger.info("Added rule: {}", rule)
-	    }
-	  }
-	}
-      } catch { 
-	case e: IllegalArgumentException => logger.warn("Unable to create rule for {}, error was {}", ruleElement:Any, e.getMessage():Any)
+              val rule = PatternReplaceRule.getInstance(id.get, pattern.get, replace.get)
+              rules = rules.updated(id.get, rule)
+              logger.info("Added rule: {}", rule)
+            }
+          }
+        }
+      } catch {
+        case e: IllegalArgumentException => logger.warn("Unable to create rule for {}, error was {}", ruleElement:Any, e.getMessage():Any)
       }
     }
     rules
@@ -139,9 +139,9 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
    */
   private def extractFieldRuleMappings(args: NamedList[_]): List[FieldPatternReplaceRules] = {
     var fieldPatternRules: Map[String, FieldPatternReplaceRules] = new HashMap
-    
+
     val idRules: Map[String, PatternReplaceRule] = extractRules(args)
-    
+
     val fieldsElement = Option(args.get("fields")).filter(_.isInstanceOf[NamedList[_]]).map(_.asInstanceOf[NamedList[_]])
     if (fieldsElement.isDefined) {
       val itr = fieldsElement.get.iterator().asScala
@@ -149,21 +149,21 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
         val kv = itr.next
         if(kv.getValue().isInstanceOf[String]) {
           val fieldName = kv.getKey()
-	  val ruleId = kv.getValue().asInstanceOf[String]
+          val ruleId = kv.getValue().asInstanceOf[String]
           // Make sure there is a FieldPatternReplaceRules attached to the field in the fieldPatternRules
           var fr = fieldPatternRules.get(fieldName) match {
-	    case None => { 
-	      val fprr = new FieldPatternReplaceRules(fieldName)
-	      fieldPatternRules = fieldPatternRules.updated(fieldName, fprr)
-	      fprr
-	    }
-	    case Some(x) => x
-	  }
-	  
-	  idRules.get(ruleId) match {
-	    case Some(x) => fr.add(x)
-	    case None => logger.warn("Unknown rule id {}", ruleId)
-	  }
+            case None => {
+              val fprr = new FieldPatternReplaceRules(fieldName)
+              fieldPatternRules = fieldPatternRules.updated(fieldName, fprr)
+              fprr
+            }
+            case Some(x) => x
+          }
+
+          idRules.get(ruleId) match {
+            case Some(x) => fr.add(x)
+            case None => logger.warn("Unknown rule id {}", ruleId)
+          }
         } else {
           logger.warn("Element in fields list not a <str> element [{}]", kv)
         }
@@ -191,7 +191,7 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
       fieldPatternRules.foreach((rule) => logger.info("Field [{}] configured with rule {}", rule.fieldName:Any, rule:Any) )
     }
   }
-  
+
   /** Factory method for the PatternReplaceProcessor called by Solr processor chain.
    *
    * @param solrQueryRequest SolrQueryRequest

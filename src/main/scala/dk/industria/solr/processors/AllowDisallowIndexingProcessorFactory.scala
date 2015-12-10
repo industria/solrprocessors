@@ -86,24 +86,24 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
       val key = kv.getKey()
       if ((null == key) || (0 == key.trim().length())) {
         logger.warn("Item missing name attribute: {}", kv)
-      } else { 
+      } else {
         val oValue = kv.getValue()
         if (!oValue.isInstanceOf[String]) {
           logger.warn("Item not a <str> element: {}", kv)
         } else {
-	  val value = oValue.asInstanceOf[String].trim()
-	  if (0 == value.length()) {
+          val value = oValue.asInstanceOf[String].trim()
+          if (0 == value.length()) {
             logger.warn("Item trimmed value is empty: {}", kv)
-	  } else {
-	    try {
+          } else {
+            try {
               val rule = new FieldMatchRule(key, value)
-	      rules = rule :: rules
+              rules = rule :: rules
               logger.debug("Added FieldMatchRule : {}", rule)
-	    } catch {
-	      case e: IllegalArgumentException => logger.warn("Couldn't create FieldMatchRule: {}", e.getMessage())
-	    }
-	  }
-	}
+            } catch {
+              case e: IllegalArgumentException => logger.warn("Couldn't create FieldMatchRule: {}", e.getMessage())
+            }
+          }
+        }
       }
     }
     logger.info("Rules configured: {}", rules)
@@ -134,7 +134,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    * @return List of rules.
    */
   def rules: List[FieldMatchRule] = _rules
-  
+
   /** Init called by Solr processor chain
    *
    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
@@ -150,7 +150,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
       if (disallow.isDefined) {
         logger.debug("Running with disallow semantics: {}", disallow.get)
         _mode = AllowDisallowMode.Disallow
-	_rules = getFieldMatchRules(disallow.get)
+        _rules = getFieldMatchRules(disallow.get)
       } else {
         logger.warn("No rules configured for the processor. Consider removing it from chain.")
         _mode = AllowDisallowMode.Unknown;

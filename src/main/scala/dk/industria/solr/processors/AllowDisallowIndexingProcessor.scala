@@ -54,26 +54,24 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
   private def rulesMatch(document: SolrInputDocument): Boolean = {
     rules.exists(
       (rule: FieldMatchRule) => {
-	logger.debug("Testing rule: {}", rule)
-	val fieldValues = document.getFieldValues(rule.field)
-	if(null == fieldValues) return false
+        logger.debug("Testing rule: {}", rule)
+        val fieldValues = document.getFieldValues(rule.field)
+        if(null == fieldValues) return false
 
-	fieldValues.asScala.exists(
-	  (v: Any) => {
-	    if (v.isInstanceOf[String]) {
-	      val sv = v.asInstanceOf[String]
-	      val ruleMatches = rule.matches(sv)
-	      if (ruleMatches) {
-		logger.debug("Matched rule [{}] on value [{}]", rule:Any, sv:Any)
-	      }
-	      ruleMatches
-	    } else {
-	      false
-	    }	  
-	  }
-	
-	) // field value exists
-
+        fieldValues.asScala.exists(
+          (v: Any) => {
+            if (v.isInstanceOf[String]) {
+              val sv = v.asInstanceOf[String]
+              val ruleMatches = rule.matches(sv)
+              if (ruleMatches) {
+                logger.debug("Matched rule [{}] on value [{}]", rule:Any, sv:Any)
+              }
+              ruleMatches
+            } else {
+              false
+            }
+          }
+        ) // field value exists
       }
     ) // rule exists
   }
@@ -106,7 +104,6 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
     } else {
       val document = cmd.getSolrInputDocument()
       val ruleMatch = rulesMatch(document)
-      
       val documentUniqueKeyValue = uniqueKeyValue(document)
       if ((this.mode == AllowDisallowMode.Allow) && (!ruleMatch)) {
         logger.info("DocId [{}] discarded - allow mode without rule match", documentUniqueKeyValue)

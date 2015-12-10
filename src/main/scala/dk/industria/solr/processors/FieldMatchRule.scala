@@ -24,7 +24,7 @@ package dk.industria.solr.processors
 class FieldMatchRule(val field: String, patternToMatch: String) {
   require(null != field)
   require(null != patternToMatch)
-  
+
   /**
    * Pattern to match against the field.
    */
@@ -34,7 +34,7 @@ class FieldMatchRule(val field: String, patternToMatch: String) {
    * Matches the field value against the pattern.
    * @param fieldValue Value to test the pattern against.
    * @return True if the pattern matches the field value.
-   */ 
+   */
   def matches(fieldValue: String): Boolean = {
     if(null == fieldValue) return false;
 
