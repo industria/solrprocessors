@@ -72,6 +72,19 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
     return document
   }
 
+  test("NullPointerException when rule fields are not in the fields collection") {
+    val document = new SolrInputDocument()
+    document.addField("content_typex", "fisk")
+
+    val cmd = new AddUpdateCommand(null)
+    cmd.solrDoc = document
+
+    val passRecorder = new AllowDisallowIndexingProcessorNext(null)
+    val processor = getProcessor(createDefaultNewsConfig("allow"), passRecorder)
+    processor.processAdd(cmd)
+    assert(!passRecorder.called)
+  }
+
   /**
    * Checks the getInstance creates an UpdateRequestProcessor.
    */
@@ -127,4 +140,5 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
     processor.processAdd(cmd)
     assert(passRecorder.called)
   }
+
 }

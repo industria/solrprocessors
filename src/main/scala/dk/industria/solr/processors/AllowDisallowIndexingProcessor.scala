@@ -56,6 +56,7 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
       (rule: FieldMatchRule) => {
 	logger.debug("Testing rule: {}", rule)
 	val fieldValues = document.getFieldValues(rule.field)
+	if(null == fieldValues) return false
 
 	fieldValues.asScala.exists(
 	  (v: Any) => {
@@ -72,7 +73,7 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value, rules: List[
 	  }
 	
 	) // field value exists
-	
+
       }
     ) // rule exists
   }
