@@ -28,31 +28,31 @@ import scala.collection.JavaConverters._
 
 import scala.language.existentials
 /**
- * Implements a factory for the AllowDisallowIndexingProcessor
- * <p/>
- * <p>The main purpose of this is to process the init arguments into a list
- * of field match rules and a mode of operation.</p>
- * <p/>
- * <p>Configuration is done by placing a lst element within the processor element
- * with a name attribute set to either allow or disallow which indicates the mode
- * of operation. Within that lst element str elements with the name attribute set
- * to the field to match and the value to the matching rule.</p>
- * <p/>
- * <p>Example processor configuration with mode of operation set to allow and matching
- * field rules content_type = default and content_type = news, which would index
- * all document with the field content_type set to either default or news:</p>
- * <p/>
- * <pre>
- * {@code
- * <processor class="dk.industria.solr.processors.AllowDisallowIndexingProcessorFactory">
- *   <lst name="allow">
- *     <str name="content_type">default</str>
- *     <str name="content_type">news</str>
- *     </lst>
- * </processor>
- * }
- * </pre>
- */
+  * Implements a factory for the AllowDisallowIndexingProcessor
+  * <p/>
+  * <p>The main purpose of this is to process the init arguments into a list
+  * of field match rules and a mode of operation.</p>
+  * <p/>
+  * <p>Configuration is done by placing a lst element within the processor element
+  * with a name attribute set to either allow or disallow which indicates the mode
+  * of operation. Within that lst element str elements with the name attribute set
+  * to the field to match and the value to the matching rule.</p>
+  * <p/>
+  * <p>Example processor configuration with mode of operation set to allow and matching
+  * field rules content_type = default and content_type = news, which would index
+  * all document with the field content_type set to either default or news:</p>
+  * <p/>
+  * <pre>
+  * {@code
+  * <processor class="dk.industria.solr.processors.AllowDisallowIndexingProcessorFactory">
+  *   <lst name="allow">
+  *     <str name="content_type">default</str>
+  *     <str name="content_type">news</str>
+  *     </lst>
+  * </processor>
+  * }
+  * </pre>
+  */
 class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactory {
   /** Logger */
   private val logger = LoggerFactory.getLogger(getClass)
@@ -64,20 +64,20 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
   private var _rules: List[FieldMatchRule] = Nil
 
   /** Get the NamedList associated with a key.
-   *
-   * @param args The NamedList to look for the key.
-   * @param key  The key to look for in the list.
-   * @return Option NamedList associated with the key.
-   */
+    *
+    * @param args The NamedList to look for the key.
+    * @param key  The key to look for in the list.
+    * @return Option NamedList associated with the key.
+    */
   private def getConfiguredList(args: NamedList[_], key: String): Option[NamedList[_]] = {
     Option(args.get(key)).filter(_.isInstanceOf[NamedList[_]]).map(_.asInstanceOf[NamedList[_]])
   }
 
   /** Converts the raw NamedList field match configuration to a list of FieldMatchRule.
-   *
-   * @param configuration The NamedList of allow/disallow lst element (solrconfig.xml).
-   * @return List of FieldMatchRule items.
-   */
+    *
+    * @param configuration The NamedList of allow/disallow lst element (solrconfig.xml).
+    * @return List of FieldMatchRule items.
+    */
   private def getFieldMatchRules(configuration: NamedList[_]): List[FieldMatchRule] = {
     var rules: List[FieldMatchRule] = Nil
     val itr = configuration.iterator().asScala
@@ -111,10 +111,10 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
   }
 
   /** Get the name of the unique key defined for the schema.
-   *
-   * @param request SolrQueryRequest
-   * @return Option String containing the name of the schema unique key.
-   */
+    *
+    * @param request SolrQueryRequest
+    * @return Option String containing the name of the schema unique key.
+    */
   private def uniqueKey(request: SolrQueryRequest): Option[String] = {
     Option(request) match {
       case Some(r) => {
@@ -126,21 +126,21 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
   }
 
   /** Get the configured mode of operation.
-   *
-   * @return Mode of operation as a AllowDisallowMode enum.
-   */
+    *
+    * @return Mode of operation as a AllowDisallowMode enum.
+    */
   def mode: AllowDisallowMode.Value = _mode
 
   /** Get the list of field match rules configured.
-   *
-   * @return List of rules.
-   */
+    *
+    * @return List of rules.
+    */
   def rules: List[FieldMatchRule] = _rules
 
   /** Init called by Solr processor chain
-   *
-   * @param args NamedList of parameters set in the processor definition in solrconfig.xml
-   */
+    *
+    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
+    */
   override def init(args: NamedList[_]) {
     val allow = getConfiguredList(args, "allow")
     if (allow.isDefined) {
@@ -161,12 +161,12 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
   }
 
   /** Factory method for the AllowDisallowIndexingProcessor called by Solr processor chain.
-   *
-   * @param solrQueryRequest SolrQueryRequest
-   * @param solrQueryResponse SolrQueryResponse
-   * @param updateRequestProcessor UpdateRequestProcessor
-   * @return Instance of AllowDisallowIndexingProcessor initialized with the fields to process.
-   */
+    *
+    * @param solrQueryRequest SolrQueryRequest
+    * @param solrQueryResponse SolrQueryResponse
+    * @param updateRequestProcessor UpdateRequestProcessor
+    * @return Instance of AllowDisallowIndexingProcessor initialized with the fields to process.
+    */
   override def getInstance(solrQueryRequest: SolrQueryRequest,
                            solrQueryResponse: SolrQueryResponse,
                            updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {
