@@ -15,34 +15,30 @@
  */
 package dk.industria.solr.processors
 
-/**
- * Represents a rule for matching field values
- * <p>Used by the @see AllowDisallowIndexingProcessor.</p>.
- * @param field Name of the field to match the pattern against.
- * @param patternToMatch Regular expression to match against the field.
- */
+/** Represents a rule for matching field values
+  *
+  * Used by the @see AllowDisallowIndexingProcessor.
+  *
+  * @param field Name of the field to match the pattern against.
+  * @param patternToMatch Regular expression to match against the field.
+  */
 class FieldMatchRule(val field: String, patternToMatch: String) {
-  require(null != field)
-  require(null != patternToMatch)
+  require(Option(field).isDefined)
+  require(Option(patternToMatch).isDefined)
 
-  /**
-   * Pattern to match against the field.
-   */
-  private val _pattern = patternToMatch.r
+  /** Pattern to match against the field. */
+  private val pattern = patternToMatch.r
 
-  /**
-   * Matches the field value against the pattern.
-   * @param fieldValue Value to test the pattern against.
-   * @return True if the pattern matches the field value.
-   */
-  def matches(fieldValue: String): Boolean = {
-    (null != fieldValue) && _pattern.findFirstMatchIn(fieldValue).isDefined
-  }
+  /** Matches the field value against the pattern.
+    *
+    * @param fieldValue Value to test the pattern against.
+    * @return True if the pattern matches the field value.
+    */
+  def matches(fieldValue: String): Boolean = Option(fieldValue).flatMap(pattern.findFirstMatchIn(_)).isDefined
 
-  /**
-   * Returns a String representation of the field match rule.
-   * @return String representing the rule.
-   */
-  override def toString(): String = s"$field =~ m/${_pattern}/"
-
+  /** Returns a String representation of the field match rule.
+    *
+    * @return String representing the rule.
+    */
+  override def toString(): String = s"$field =~ m/${pattern}/"
 }
