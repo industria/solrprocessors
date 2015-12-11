@@ -30,17 +30,14 @@ import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 
 class PatternReplaceProcessor(fieldPatternRules: List[FieldPatternReplaceRules], next: UpdateRequestProcessor) extends UpdateRequestProcessor(next) {
-  /**
-   * Logger
-   */
+  /** Logger */
   private val logger = LoggerFactory.getLogger(getClass())
 
-  /**
-   * Called by the processor chain on document add/update operations.
-   *
-   * @param cmd AddUpdateCommand
-   * @throws IOException
-   */
+  /** Called by the processor chain on document add/update operations.
+    *
+    * @param cmd AddUpdateCommand
+    * @throws IOException
+    */
   @throws(classOf[IOException])
   override def processAdd(cmd: AddUpdateCommand): Unit =  {
     val document = cmd.getSolrInputDocument()
