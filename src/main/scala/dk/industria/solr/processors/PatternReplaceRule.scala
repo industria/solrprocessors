@@ -48,23 +48,12 @@ class PatternReplaceRule(id: String, pattern: Pattern, replacement: String) {
     matcher.replaceAll(replacement)
   }
 
-
   /**
    * Get a String representation of the pattern replace rule.
    *
    * @return String representation of the pattern replace rule.
    */
-  override def toString(): String = {
-    val s = new StringBuilder()
-    s.append("Id: [")
-    s.append(this.id)
-    s.append("] Pattern: [")
-    s.append(this.pattern)
-    s.append("] Replace: [")
-    s.append(this.replacement)
-    s.append("]")
-    s.toString()
-  }
+  override def toString(): String = s"Id: [${this.id}] Pattern: [${this.pattern}] Replace: [${this.replacement}]"
 }
 
 object PatternReplaceRule {
