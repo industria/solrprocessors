@@ -83,8 +83,8 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
     val itr = configuration.iterator().asScala
     while (itr.hasNext) {
       val kv = itr.next
-      val key = kv.getKey()
-      if ((null == key) || (0 == key.trim().length())) {
+      val key = Option(kv.getKey())
+      if (key.isEmpty || (0 == key.get.trim().length())) {
         logger.warn("Item missing name attribute: {}", kv)
       } else {
         val oValue = kv.getValue()
@@ -96,7 +96,7 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
             logger.warn("Item trimmed value is empty: {}", kv)
           } else {
             try {
-              val rule = new FieldMatchRule(key, value)
+              val rule = new FieldMatchRule(key.get, value)
               rules = rule :: rules
               logger.debug("Added FieldMatchRule : {}", rule)
             } catch {
