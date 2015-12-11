@@ -25,15 +25,13 @@ import org.apache.solr.common.util.NamedList
 
 import org.apache.solr.update.AddUpdateCommand
 
-/**
- * Implements tests for AllowDisallowIndexingProcessor.
- */
+/** Implements tests for AllowDisallowIndexingProcessor. */
 class AllowDisallowIndexingProcessorTest extends FunSuite {
-  /**
-   * Create a configuration with content_type default and news
-   * @param mode String to act as lst name attribute value
-   * @return NamedList configured for mode.
-   */
+  /** Create a configuration with content_type default and news
+    *
+    * @param mode String to act as lst name attribute value
+    * @return NamedList configured for mode.
+    */
   private def createDefaultNewsConfig(mode: String): NamedList[NamedList[String]] = {
     val rules = new NamedList[String]()
     rules.add("content_type", "default")
@@ -44,24 +42,24 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
     return args
   }
 
-  /**
-   *  Create a update request processor with init arguments.
-   * @param args NamedList containing the init arguments for the update request processor.
-   * @param next UpdateRequestProcessor called if the processor passed the request on.
-   * @return UpdateRequestProcessor based on the init arguments in args.
-   */
+  /** Create a update request processor with init arguments.
+    *
+    * @param args NamedList containing the init arguments for the update request processor.
+    * @param next UpdateRequestProcessor called if the processor passed the request on.
+    * @return UpdateRequestProcessor based on the init arguments in args.
+    */
   private def getProcessor(args: NamedList[NamedList[String]], next: UpdateRequestProcessor): UpdateRequestProcessor = {
     val factory = new AllowDisallowIndexingProcessorFactory()
     factory.init(args)
     factory.getInstance(null, null, next)
   }
 
-  /**
-   * Create a Solr input document with fields header, content and content_type
-   * where content_type is set by the content_type argument.
-   * @param contentType The content type field value.
-   * @return SolrInputDocument with a content_type of the content_type argument.
-   */
+  /** Create a Solr input document with fields header, content and content_type
+    * where content_type is set by the content_type argument.
+    *
+    * @param contentType The content type field value.
+    * @return SolrInputDocument with a content_type of the content_type argument.
+    */
   private def createDocument(contentType: String): SolrInputDocument = {
     val document = new SolrInputDocument()
     
@@ -85,17 +83,13 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
     assert(!passRecorder.called)
   }
 
-  /**
-   * Checks the getInstance creates an UpdateRequestProcessor.
-   */
+  /** Checks the getInstance creates an UpdateRequestProcessor. */
   test("Instance creation") {
     val processor = getProcessor(createDefaultNewsConfig("allow"), null)
     assert(null != processor)
   }
 
-  /**
-   * Allow mode field with a match and thereby catching a pass in the recorder
-   */
+  /** Allow mode field with a match and thereby catching a pass in the recorder */
   test("Document allow match") {
     val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocument("default")
@@ -105,9 +99,7 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
     assert(passRecorder.called)
   }
 
-  /**
-   * Allow mode field without a match and thereby not catching a pass in the recorder
-   */
+  /** Allow mode field without a match and thereby not catching a pass in the recorder */
   test("Document allow with no match") {
     val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocument("person")
@@ -117,9 +109,7 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
     assert(!passRecorder.called)
   }
 
-  /**
-   * Disallow mode field with a match and thereby not catching a pass in the recorder
-   */
+  /** Disallow mode field with a match and thereby not catching a pass in the recorder */
   test("Document disallow match") {
     val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocument("default")
@@ -129,9 +119,7 @@ class AllowDisallowIndexingProcessorTest extends FunSuite {
     assert(!passRecorder.called)
   }
 
-  /**
-   * Disallow mode field without a match and thereby catching a pass in the recorder
-   */
+  /** Disallow mode field without a match and thereby catching a pass in the recorder */
   test("Document disallow with no match") {
     val cmd = new AddUpdateCommand(null)
     cmd.solrDoc = createDocument("person")

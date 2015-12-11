@@ -26,34 +26,32 @@ import org.slf4j.LoggerFactory;
 
 import scala.collection.JavaConverters._
 
-/**
- * <p>Implements an UpdateRequestProcessor for filtering documents based on allow/disallow rules
- * matching regular expressions in field values.
- * <p/>
- * For more information @see AllowDisallowIndexingProcessorFactory
- * @param mode      AllowDisallowMode indicating the mode of operation.
- * @param rules     List of field match rule.
- * @param uniqueKey Name of the document unique key. Null is no unique key is defined in the schema.
- * @param next      Next UpdateRequestProcessor in the processor chain.
- */
+/** Implements an UpdateRequestProcessor for filtering documents based on allow/disallow rules
+  * matching regular expressions in field values.
+  *
+  * For more information @see AllowDisallowIndexingProcessorFactory
+  *
+  * @param mode      AllowDisallowMode indicating the mode of operation.
+  * @param rules     List of field match rule.
+  * @param uniqueKey Name of the document unique key. Null is no unique key is defined in the schema.
+  * @param next      Next UpdateRequestProcessor in the processor chain.
+  */
 class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value,
                                      rules: List[FieldMatchRule],
                                      uniqueKey: Option[String],
                                      next: UpdateRequestProcessor) extends UpdateRequestProcessor(next) {
-  /**
-   * Logger
-   * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
-   * which makes controlling log output from this project difficult unless a different
-   * logger is used as in this case.
-   */
+  /** Logger
+    * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
+    * which makes controlling log output from this project difficult unless a different
+    * logger is used as in this case.
+    */
   private val logger = LoggerFactory.getLogger(getClass())
 
-  /**
-   * Indicates if running the rules results in a match on the document.
-   *
-   * @param document SolrInputDocument to run rules against.
-   * @return True if one of the rules matched the document.
-   */
+  /** Indicates if running the rules results in a match on the document.
+    *
+    * @param document SolrInputDocument to run rules against.
+    * @return True if one of the rules matched the document.
+    */
   private def rulesMatch(document: SolrInputDocument): Boolean = {
     rules.exists(
       (rule: FieldMatchRule) => {
@@ -83,12 +81,11 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value,
     ) // rule exists
   }
 
-  /**
-   * Get the value of the documents unique key.
-   *
-   * @param document SolrInputDocument to get the value from.
-   * @return String representation of the documents unique value key.
-   */
+  /** Get the value of the documents unique key.
+    *
+    * @param document SolrInputDocument to get the value from.
+    * @return String representation of the documents unique value key.
+    */
   private def uniqueKeyValue(document: SolrInputDocument): String = {
     uniqueKey match {
       case Some(x) => String.valueOf(document.getFieldValue(x))
@@ -96,13 +93,12 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value,
     }
   }
 
-  /**
-   * Called by the processor chain on document add/update operations.
-   * This is where we check the allow / disallow rules.
-   *
-   * @param cmd AddUpdateCommand
-   * @throws IOException
-   */
+  /** Called by the processor chain on document add/update operations.
+    * This is where we check the allow / disallow rules.
+    *
+    * @param cmd AddUpdateCommand
+    * @throws IOException
+    */
   @throws(classOf[IOException])
   override def processAdd(cmd: AddUpdateCommand): Unit = {
     if (this.mode == AllowDisallowMode.Unknown) {
