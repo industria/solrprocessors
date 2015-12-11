@@ -67,7 +67,7 @@ class HTMLStripCharFilterProcessorFactory extends UpdateRequestProcessorFactory 
    * @return String on the form {field1} {field2} ... {fieldN}
    */
   private def configuredFieldsString(fields: List[String]): String = {
-    val s = new StringBuilder(256)
+    val s = new StringBuilder()
     fields foreach { s.append(" {").append(_).append("}") }
     s.toString()
   }
