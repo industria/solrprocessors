@@ -116,11 +116,13 @@ class AllowDisallowIndexingProcessorFactory extends UpdateRequestProcessorFactor
    * @return Option String containing the name of the schema unique key.
    */
   private def uniqueKey(request: SolrQueryRequest): Option[String] = {
-    if(null == request) return None
-
-    val core = request.getCore()
-    val schema = core.getLatestSchema()
-    Option(schema.getUniqueKeyField()).map(_.getName())
+    Option(request) match {
+      case Some(r) => {
+        val schema = r.getCore().getLatestSchema()
+        Option(schema.getUniqueKeyField()).map(_.getName())
+      }
+      case _ => None
+    }
   }
 
   /** Get the configured mode of operation.
