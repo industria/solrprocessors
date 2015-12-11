@@ -58,23 +58,27 @@ class AllowDisallowIndexingProcessor(mode: AllowDisallowMode.Value,
     rules.exists(
       (rule: FieldMatchRule) => {
         logger.debug("Testing rule: {}", rule)
-        val fieldValues = document.getFieldValues(rule.field)
-        if(null == fieldValues) return false
-
-        fieldValues.asScala.exists(
-          (v: Any) => {
-            if (v.isInstanceOf[String]) {
-              val sv = v.asInstanceOf[String]
-              val ruleMatches = rule.matches(sv)
-              if (ruleMatches) {
-                logger.debug("Matched rule [{}] on value [{}]", rule:Any, sv:Any)
+        val fieldValues = Option(document.getFieldValues(rule.field))
+        if(fieldValues.isEmpty) {
+          false
+        } else {
+          fieldValues.get.asScala.exists(
+            (v: Any) => {
+              if (v.isInstanceOf[String]) {
+                val sv = v.asInstanceOf[String]
+                val ruleMatches = rule.matches(sv)
+                if (ruleMatches) {
+                  logger.debug("Matched rule [{}] on value [{}]", rule:Any, sv:Any)
+                }
+                ruleMatches
+              } else {
+                false
               }
-              ruleMatches
-            } else {
-              false
             }
-          }
-        ) // field value exists
+          ) // field value exists
+
+        }
+
       }
     ) // rule exists
   }
