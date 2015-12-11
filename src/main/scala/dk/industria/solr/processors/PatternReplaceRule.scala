@@ -17,60 +17,57 @@ package dk.industria.solr.processors;
 
 import java.util.regex.{Matcher, Pattern, PatternSyntaxException}
 
-/**
- * Represents a pattern replace rule for the PatternReplaceProcessor .
- * @param id Id used to identify the rule.
- * @param pattern Regular expression defining the pattern.
- * @param replacement Value to replace the pattern match with.
- */
+/** Represents a pattern replace rule for the PatternReplaceProcessor.
+  *
+  * @param id Id used to identify the rule.
+  * @param pattern Regular expression defining the pattern.
+  * @param replacement Value to replace the pattern match with.
+  */
 class PatternReplaceRule(id: String, pattern: Pattern, replacement: String) {
-  require(null != id)
+  require(Option(id).isDefined)
   require(0 < id.length)
-  require(null != pattern)
-  require(null != replacement)
+  require(Option(pattern).isDefined)
+  require(Option(replacement).isDefined)
 
-  /**
-   * Get id of the rule.
-   *
-   * @return String containing the id of the rule.
-   */
+  /** Get id of the rule.
+    *
+    * @return String containing the id of the rule.
+    */
   def getId(): String = id
 
-  /**
-   * Apply the pattern replace rule to a value.
-   * @param value Value to apply the pattern replace rule to.
-   * @return Value after the rule has been applied to the value.
-   */
+  /** Apply the pattern replace rule to a value.
+    *
+    * @param value Value to apply the pattern replace rule to.
+    * @return Value after the rule has been applied to the value.
+    */
   def replace(value: String): String = {
-    require(null != value)
+    require(Option(value).isDefined)
 
     val matcher = pattern.matcher(value)
     matcher.replaceAll(replacement)
   }
 
-  /**
-   * Get a String representation of the pattern replace rule.
-   *
-   * @return String representation of the pattern replace rule.
-   */
+  /** Get a String representation of the pattern replace rule.
+    *
+    * @return String representation of the pattern replace rule.
+    */
   override def toString(): String = s"Id: [${this.id}] Pattern: [${this.pattern}] Replace: [${this.replacement}]"
 }
 
 object PatternReplaceRule {
-  /**
-   * Create a new PatternReplaceRule.
-   *
-   * @param id Id used to identify the rule in field mappings.
-   * @param pattern String containing the regular expression defining the pattern to replace.
-   * @param replacement String containing the value to replace pattern matches with. Null equals an empty string.
-   * @return PatternReplaceRule
-   * @throws IllegalArgumentException If iid is null or empty. If the pattern isn't a regular expression.
-   */
+  /** Create a new PatternReplaceRule.
+    *
+    * @param id Id used to identify the rule in field mappings.
+    * @param pattern String containing the regular expression defining the pattern to replace.
+    * @param replacement String containing the value to replace pattern matches with. Null equals an empty string.
+    * @return PatternReplaceRule
+    * @throws IllegalArgumentException If iid is null or empty. If the pattern isn't a regular expression.
+    */
   @throws(classOf[IllegalArgumentException])
   def getInstance(id: String, pattern: String, replacement: String): PatternReplaceRule = {
-    require(null != id)
+    require(Option(id).isDefined)
     require(0 < id.length)
-    require(null != pattern)
+    require(Option(pattern).isDefined)
 
     try {
       val compiledPattern = Pattern.compile(pattern)
