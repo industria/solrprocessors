@@ -46,12 +46,12 @@ class PatternReplaceProcessor(fieldPatternRules: List[FieldPatternReplaceRules],
       val fieldName = fieldRules.fieldName
       logger.debug("Processing field: {}", fieldName)
 
-      val field = document.getField(fieldName)
-      if (null != field) {
-        val values = field.getValues()
-        if (null != values) {
+      val field = Option(document.getField(fieldName))
+      if (field.isDefined) {
+        val values = Option(field.get.getValues())
+        if (values.isDefined) {
           val newValues: Collection[Object] = new ArrayList[Object]()
-          for (value <- values.asScala) {
+          for (value <- values.get.asScala) {
             if (value.isInstanceOf[String]) {
               var newValue = fieldRules.replace(value.asInstanceOf[String])
               newValues.add(newValue);
@@ -59,8 +59,8 @@ class PatternReplaceProcessor(fieldPatternRules: List[FieldPatternReplaceRules],
               newValues.add(value);
             }
           }
-          val boost = field.getBoost()
-          field.setValue(newValues, boost)
+          val boost = field.get.getBoost()
+          field.get.setValue(newValues, boost)
         }
       }
     }
