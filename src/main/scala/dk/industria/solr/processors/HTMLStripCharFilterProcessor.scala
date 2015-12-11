@@ -30,40 +30,37 @@ import org.apache.solr.update.processor.UpdateRequestProcessor
 
 import scala.collection.JavaConverters._
 
-/**
- * Implements an UpdateRequestProcessor for running Solr HTMLStripCharFilter on
- * select document fields before they are stored.
- * <p/>
- *  In addition to running the HTMLStringCharFilter it also space normalizes the fields
- *  by removing no-break spaces, trimming leading and trailing spaces and finally
- *  replaces multiple recurring spaces with a single space.
- * <p/>
- * For more information on configuration @see HTMLStripCharFilterProcessorFactory
- *
- * @param fieldsToProcess List of field names to process.
- * @param spaceNormalize Set to true if field values should be space normalized.
- * @param next   Next UpdateRequestProcessor in the processor chain.
- */
+/** Implements an UpdateRequestProcessor for running Solr HTMLStripCharFilter on
+  * select document fields before they are stored.
+  * <p/>
+  *  In addition to running the HTMLStringCharFilter it also space normalizes the fields
+  *  by removing no-break spaces, trimming leading and trailing spaces and finally
+  *  replaces multiple recurring spaces with a single space.
+  * <p/>
+  * For more information on configuration @see HTMLStripCharFilterProcessorFactory
+  *
+  * @param fieldsToProcess List of field names to process.
+  * @param spaceNormalize Set to true if field values should be space normalized.
+  * @param next   Next UpdateRequestProcessor in the processor chain.
+  */
 class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize: Boolean, next: UpdateRequestProcessor) extends UpdateRequestProcessor(next) {
-  /**
-   * Logger
-   * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
-   * which makes controlling log output from this project difficult unless a different
-   * logger is used as in this case.
-   */
+  /** Logger
+    * UpdateRequestProcessor has it's own log variable tied to the UpdateRequestProcessor class,
+    * which makes controlling log output from this project difficult unless a different
+    * logger is used as in this case.
+    */
   private val logger = LoggerFactory.getLogger(getClass())
-  /**
-   * Size of the buffer used to read the input through the HTMLStripCharFilter.
-   */
+
+  /** Size of the buffer used to read the input through the HTMLStripCharFilter. */
   private val BUFFER_SIZE = 4096;
-  /**
-   * Space normalizes the string by changing no-break space into normal spaces,
-   * trimming the string for leading and trailing spaces and finally removing
-   * duplicate spaces from the string.
-   *
-   * @param text String to space normalize.
-   * @return String with normalized spaces.
-   */
+
+  /** Space normalizes the string by changing no-break space into normal spaces,
+    * trimming the string for leading and trailing spaces and finally removing
+    * duplicate spaces from the string.
+    *
+    * @param text String to space normalize.
+    * @return String with normalized spaces.
+    */
   private def normalizeSpace(text: String): String = {
     // Replace no-break space
     val noBreakRemoved = text.replaceAll("\u00A0", " ")
@@ -72,13 +69,12 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
     trimmed.replaceAll("\\p{Space}{2,}", " ")
   }
 
-  /**
-   * Strip HTML/XML from string by reading it through the Solr HTMLStripCharFilter.
-   *
-   * @param text String containing HTML/XML to be stripped.
-   * @return String with HTML/XML removed.
-   * @throws IOException  if reading the string through the HTMLStripCharFilter.
-   */
+  /** Strip HTML/XML from string by reading it through the Solr HTMLStripCharFilter.
+    *
+    * @param text String containing HTML/XML to be stripped.
+    * @return String with HTML/XML removed.
+    * @throws IOException  if reading the string through the HTMLStripCharFilter.
+    */
   @throws(classOf[IOException])
   private def runHtmlStripCharFilter(text: String): String = {
     val stripped = new StringBuilder(BUFFER_SIZE)
@@ -110,13 +106,12 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
     stripped.toString()
   }
 
-  /**
-   * Called by the processor chain on document add/update operations.
-   * This is where we process the fields configured before they are indexed.
-   *
-   * @param cmd AddUpdateCommand
-   * @throws IOException
-   */
+  /** Called by the processor chain on document add/update operations.
+    * This is where we process the fields configured before they are indexed.
+    *
+    * @param cmd AddUpdateCommand
+    * @throws IOException
+    */
   @throws(classOf[IOException])
   override def processAdd(cmd: AddUpdateCommand): Unit = {
     val doc = cmd.getSolrInputDocument()
