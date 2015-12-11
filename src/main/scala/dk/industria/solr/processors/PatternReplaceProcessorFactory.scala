@@ -83,24 +83,24 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
   private var fieldPatternRules: List[FieldPatternReplaceRules] = Nil
 
   /** Get a String element from a NamedList.
-   *
-   * @param args NamedList to get the String from.
-   * @param name String containing the name of the name attribute to retrieve.
-   * @return Option value of the name attribute.
-   */
+    *
+    * @param args NamedList to get the String from.
+    * @param name String containing the name of the name attribute to retrieve.
+    * @return Option value of the name attribute.
+    */
   private def getStringElement(args: NamedList[_], name: String): Option[String] = {
     Option(args.get(name)).filter(_.isInstanceOf[String]).map(_.asInstanceOf[String])
   }
 
   /** Extract pattern replace rules from the processor chain arguments.
-   *
-   * A rule needs to be a NamedList type entry with name attribute set to rule
-   * and containing three String type entries with name attribute set to
-   * id, pattern and replace.
-   *
-   * @param args NamedList as supplied by the processor chain.
-   * @return Map of PatternReplaceRule extracted from the processor arguments keyed by id.
-   */
+    *
+    * A rule needs to be a NamedList type entry with name attribute set to rule
+    * and containing three String type entries with name attribute set to
+    * id, pattern and replace.
+    *
+    * @param args NamedList as supplied by the processor chain.
+    * @return Map of PatternReplaceRule extracted from the processor arguments keyed by id.
+    */
   private def extractRules(args: NamedList[_]): Map[String, PatternReplaceRule] = {
     var rules: Map[String, PatternReplaceRule] = new HashMap
 
@@ -133,10 +133,10 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
   }
 
   /** Extract field pattern replace rules..
-   *
-   * @param args NamedList with arguments as passed by the processor chain.
-   * @return List of field pattern replace rules.
-   */
+    *
+    * @param args NamedList with arguments as passed by the processor chain.
+    * @return List of field pattern replace rules.
+    */
   private def extractFieldRuleMappings(args: NamedList[_]): List[FieldPatternReplaceRules] = {
     var fieldPatternRules: Map[String, FieldPatternReplaceRules] = new HashMap
 
@@ -175,16 +175,16 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
   }
 
   /** Get collection of field pattern replace rules.
-   * Used by the Java based test cases.
-   *
-   * @return Unmodifiable collection of pattern replace rules.
-   */
+    * Used by the Java based test cases.
+    *
+    * @return Unmodifiable collection of pattern replace rules.
+    */
   def fieldRules: List[FieldPatternReplaceRules] = this.fieldPatternRules
 
   /** Init called by Solr processor chain.
-   *
-   * @param args NamedList of parameters set in the processor definition in solrconfig.xml
-   */
+    *
+    * @param args NamedList of parameters set in the processor definition in solrconfig.xml
+    */
   override def init(args: NamedList[_]): Unit = {
     fieldPatternRules = extractFieldRuleMappings(args)
     if(logger.isInfoEnabled()) {
@@ -193,12 +193,12 @@ class PatternReplaceProcessorFactory extends UpdateRequestProcessorFactory {
   }
 
   /** Factory method for the PatternReplaceProcessor called by Solr processor chain.
-   *
-   * @param solrQueryRequest SolrQueryRequest
-   * @param solrQueryResponse SolrQueryResponse
-   * @param updateRequestProcessor UpdateRequestProcessor
-   * @return Instance of PatternReplaceProcessor configured with field list and rule mapping.
-   */
+    *
+    * @param solrQueryRequest SolrQueryRequest
+    * @param solrQueryResponse SolrQueryResponse
+    * @param updateRequestProcessor UpdateRequestProcessor
+    * @return Instance of PatternReplaceProcessor configured with field list and rule mapping.
+    */
   override def getInstance(solrQueryRequest: SolrQueryRequest,
                            solrQueryResponse: SolrQueryResponse,
                            updateRequestProcessor: UpdateRequestProcessor): UpdateRequestProcessor = {

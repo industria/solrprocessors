@@ -24,12 +24,14 @@ object AllowDisallowMode extends Enumeration {
       * No rules will be run and all documents will be indexed.
       */
     val Unknown = Value
+
     /** Indicates the mode of operation is allow.
       *
       * In allow mode, only documents that matches a rule
       * will be indexed. Everything else will be filtered out.
       */
     val Allow = Value
+
     /** Indicates the mode of operation is disallow.
       *
       * In disallow mode, all documents will be indexed,
