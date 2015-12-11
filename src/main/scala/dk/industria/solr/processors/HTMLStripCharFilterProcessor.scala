@@ -117,12 +117,12 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
     val doc = cmd.getSolrInputDocument()
     for (fieldName <- this.fieldsToProcess) {
       logger.debug("Processing field: {}", fieldName)
-      val field = doc.getField(fieldName)
-      if (null != field) {
-        val values: Collection[Object] = field.getValues()
-        if (null != values) {
+      val field = Option(doc.getField(fieldName))
+      if (field.isDefined) {
+        val values: Option[Collection[Object]] = Option(field.get.getValues())
+        if (values.isDefined) {
           val newValues: Collection[Object] = new ArrayList[Object]()
-          for (value <- values.asScala) {
+          for (value <- values.get.asScala) {
             if (value.isInstanceOf[String]) {
               var newValue = runHtmlStripCharFilter(value.asInstanceOf[String])
               if(this.spaceNormalize) {
@@ -133,8 +133,8 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
               newValues.add(value)
             }
           }
-          val boost = field.getBoost()
-          field.setValue(newValues, boost)
+          val boost = field.get.getBoost()
+          field.get.setValue(newValues, boost)
         }
       }
     }
