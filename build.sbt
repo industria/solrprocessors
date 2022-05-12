@@ -1,6 +1,6 @@
 name := "solrprocessors"
 
-version := "4.6"
+version := "4.7"
 
 description := "Solr processors for use in the update request processor chain."
 
@@ -18,7 +18,7 @@ libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
 
 libraryDependencies += "org.slf4j" % "slf4j-jdk14" % "1.7.2" % "test"
 
-resolvers += "Public online Restlet repository" at "http://maven.restlet.org/"
+resolvers += "Public online Restlet repository" at "https://maven.restlet.org/"
 
 pomExtra := <xml:group>
   <name>solrprocessors</name>
@@ -27,7 +27,7 @@ pomExtra := <xml:group>
   <licenses>
     <license>
       <name>Apache 2</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>manual</distribution>
     </license>
   </licenses>
