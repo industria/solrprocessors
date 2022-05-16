@@ -1,6 +1,6 @@
 name := "solrprocessors"
 
-version := "4.7"
+version := "4.8"
 
 description := "Solr processors for use in the update request processor chain."
 
@@ -10,7 +10,7 @@ scalaVersion := "2.11.7"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-optimise", "-feature", "-Xlint", "-language:postfixOps")
 
-libraryDependencies += "org.apache.solr" % "solr-core" % "4.6.0" % "compile"
+libraryDependencies += "org.apache.solr" % "solr-core" % "8.11.1" % "compile"
 
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.2" % "compile"
 
