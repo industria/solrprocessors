@@ -133,8 +133,7 @@ class HTMLStripCharFilterProcessor(fieldsToProcess: List[String], spaceNormalize
               newValues.add(value)
             }
           }
-          val boost = field.get.getBoost()
-          field.get.setValue(newValues, boost)
+          field.get.setValue(newValues)
         }
       }
     }
