@@ -59,6 +59,7 @@ class PatternReplaceProcessor(fieldPatternRules: List[FieldPatternReplaceRules],
               newValues.add(value);
             }
           }
+          field.get.setValue(newValues)
         }
       }
     }
